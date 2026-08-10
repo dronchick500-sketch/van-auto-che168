@@ -28,16 +28,106 @@ const fs = require('fs');
 
   console.log('Открываем CHE168...');
 
-  await page.goto(url, {
-    waitUntil: 'domcontentloaded',
-    timeout: 60000
-  });
 
-  await page.waitForTimeout(10000);
+async function openChe168() {
 
-  const text = await page.locator('body').innerText();
-  const html = await page.content();
+  let lastError = null;
 
+  for (let attempt = 1; attempt <= 3; attempt++) {
+
+    try {
+
+      console.log(`Попытка ${attempt} из 3`);
+
+      /*
+        Не ждём DOMContentLoaded.
+        Нам достаточно получить ответ CHE168
+        и начать загрузку документа.
+      */
+
+      await page.goto(url, {
+        waitUntil: 'commit',
+        timeout: 45000
+      });
+
+
+      /*
+        Даём странице выполнить JavaScript
+        и подгрузить информацию автомобиля.
+      */
+
+      await page.waitForTimeout(10000);
+
+
+      const body = page.locator('body');
+
+      const currentText = await body.innerText({
+        timeout: 15000
+      });
+
+
+      console.log(
+        `Получено текста: ${currentText.length} символов`
+      );
+
+
+      /*
+        На нормальной карточке CHE168
+        должны присутствовать хотя бы
+        ключевые элементы автомобиля.
+      */
+
+      if (
+        currentText.length > 1000 &&
+        (
+          currentText.includes('上牌时间') ||
+          currentText.includes('表显里程') ||
+          currentText.includes('发动机排量')
+        )
+      ) {
+
+        console.log('Карточка CHE168 загружена');
+
+        return currentText;
+
+      }
+
+
+      throw new Error(
+        'Страница открылась, но данные автомобиля ещё не появились'
+      );
+
+
+    } catch (error) {
+
+      lastError = error;
+
+      console.log(
+        `Попытка ${attempt} не удалась: ${error.message}`
+      );
+
+
+      if (attempt < 3) {
+
+        console.log('Ждём 5 секунд и пробуем снова...');
+
+        await page.waitForTimeout(5000);
+
+      }
+
+    }
+
+  }
+
+
+  throw lastError;
+
+}
+
+
+const text = await openChe168();
+
+const html = await page.content();
 
   /* ==============================
      ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ
