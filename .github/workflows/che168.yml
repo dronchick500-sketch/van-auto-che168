@@ -45,5 +45,6 @@ jobs:
         with:
           name: che168-debug
           path: |
+            car.json
             che168.png
             che168.html
