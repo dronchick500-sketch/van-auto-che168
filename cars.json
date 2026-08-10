@@ -45,9 +45,49 @@
     "priceCny": 185000,
     "priceSource": "CHE168 live",
     "priceUpdatedAt": "2026-08-10T19:49:10.943Z",
-    "finalPriceRub": null,
-    "pricingStatus": "waiting_vtb_rate",
-    "pricingError": "Нет курса ВТБ CNY/RUB"
+    "finalPriceRub": 3490170,
+    "pricingStatus": "calculated",
+    "pricingError": null,
+    "pricingUpdatedAt": "2026-08-10T21:30:05.680Z",
+    "vtbCnyRate": 12.5,
+    "vtbRateSource": "GitHub variable VTB_CNY_RATE",
+    "cbrCnyRate": 12.2546,
+    "cbrEurRate": 95.286,
+    "chinaExpensesCny": 13000,
+    "cnyPaymentBase": 198000,
+    "bankCommissionRub": 49500,
+    "cnyPaymentRub": 2524500,
+    "customsDutyRub": 226781,
+    "customsDutyEur": 2380,
+    "customsValueEur": 23792.59,
+    "customsAgeGroup": "3to5",
+    "customsAgeSource": "registrationDate",
+    "customsAgeMonths": 55,
+    "utilFeeRub": 5200,
+    "utilCoeff": 0.26,
+    "customsOperationFeeRub": 689,
+    "customsTotalRub": 232670,
+    "russiaExpensesRub": 273000,
+    "fixedRub": 250000,
+    "deliverySpbRub": 210000,
+    "pricingBreakdown": {
+      "vehiclePriceCny": 185000,
+      "chinaExpensesCny": 13000,
+      "cnyPaymentBase": 198000,
+      "vtbCnyRate": 12.5,
+      "bankCommissionPercent": 2,
+      "paymentRubBeforeBank": 2475000,
+      "bankCommissionRub": 49500,
+      "cnyPaymentRub": 2524500,
+      "customsDutyRub": 226781,
+      "utilFeeRub": 5200,
+      "customsOperationFeeRub": 689,
+      "customsTotalRub": 232670,
+      "russiaExpensesRub": 273000,
+      "fixedRub": 250000,
+      "deliverySpbRub": 210000,
+      "finalPriceRub": 3490170
+    }
   },
   {
     "id": "59303306",
@@ -100,8 +140,8 @@
     "lastSeenAt": "2026-08-10T19:56:32.533Z",
     "status": "active",
     "finalPriceRub": null,
-    "pricingStatus": "waiting_vtb_rate",
-    "pricingError": "Нет курса ВТБ CNY/RUB"
+    "pricingStatus": "customs_not_calculated",
+    "pricingError": "Для чистого электромобиля нужен отдельный расчёт"
   },
   {
     "id": "59236888",
@@ -154,8 +194,9 @@
     "lastSeenAt": "2026-08-10T19:57:05.447Z",
     "status": "active",
     "finalPriceRub": null,
-    "pricingStatus": "waiting_vtb_rate",
-    "pricingError": "Нет курса ВТБ CNY/RUB"
+    "pricingStatus": "util_not_calculated",
+    "pricingError": "Мощность 190 л.с. выше лимита 159 л.с.",
+    "customsDutyRub": 514544
   },
   {
     "id": "59252871",
@@ -204,8 +245,8 @@
     "lastSeenAt": "2026-08-10T19:57:51.607Z",
     "status": "active",
     "finalPriceRub": null,
-    "pricingStatus": "waiting_vtb_rate",
-    "pricingError": "Нет курса ВТБ CNY/RUB"
+    "pricingStatus": "customs_not_calculated",
+    "pricingError": "Для чистого электромобиля нужен отдельный расчёт"
   },
   {
     "id": "59099540",
@@ -258,8 +299,8 @@
     "lastSeenAt": "2026-08-10T19:58:38.170Z",
     "status": "active",
     "finalPriceRub": null,
-    "pricingStatus": "waiting_vtb_rate",
-    "pricingError": "Нет курса ВТБ CNY/RUB"
+    "pricingStatus": "customs_not_calculated",
+    "pricingError": "Для чистого электромобиля нужен отдельный расчёт"
   },
   {
     "id": "59106446",
@@ -312,8 +353,8 @@
     "lastSeenAt": "2026-08-10T19:59:24.682Z",
     "status": "active",
     "finalPriceRub": null,
-    "pricingStatus": "waiting_vtb_rate",
-    "pricingError": "Нет курса ВТБ CNY/RUB"
+    "pricingStatus": "customs_not_calculated",
+    "pricingError": "Нет объёма двигателя"
   },
   {
     "id": "59284996",
@@ -366,8 +407,9 @@
     "lastSeenAt": "2026-08-10T19:59:38.718Z",
     "status": "active",
     "finalPriceRub": null,
-    "pricingStatus": "waiting_vtb_rate",
-    "pricingError": "Нет курса ВТБ CNY/RUB"
+    "pricingStatus": "util_not_calculated",
+    "pricingError": "Мощность 197 л.с. выше лимита 159 л.с.",
+    "customsDutyRub": 533602
   },
   {
     "id": "59284746",
@@ -419,9 +461,49 @@
     "addedAt": "2026-08-10T20:39:34.725Z",
     "lastSeenAt": "2026-08-10T20:39:34.725Z",
     "status": "active",
-    "finalPriceRub": null,
-    "pricingStatus": "waiting_vtb_rate",
-    "pricingError": "Нет курса ВТБ CNY/RUB"
+    "finalPriceRub": 1736316,
+    "pricingStatus": "calculated",
+    "pricingError": null,
+    "pricingUpdatedAt": "2026-08-10T21:30:05.681Z",
+    "vtbCnyRate": 12.5,
+    "vtbRateSource": "GitHub variable VTB_CNY_RATE",
+    "cbrCnyRate": 12.2546,
+    "cbrEurRate": 95.286,
+    "chinaExpensesCny": 12500,
+    "cnyPaymentBase": 40300,
+    "bankCommissionRub": 10075,
+    "cnyPaymentRub": 513825,
+    "customsDutyRub": 533602,
+    "customsDutyEur": 5600,
+    "customsValueEur": 3575.32,
+    "customsAgeGroup": "over5",
+    "customsAgeSource": "registrationDate",
+    "customsAgeMonths": 104,
+    "utilFeeRub": 5200,
+    "utilCoeff": 0.26,
+    "customsOperationFeeRub": 689,
+    "customsTotalRub": 539491,
+    "russiaExpensesRub": 223000,
+    "fixedRub": 250000,
+    "deliverySpbRub": 210000,
+    "pricingBreakdown": {
+      "vehiclePriceCny": 27800,
+      "chinaExpensesCny": 12500,
+      "cnyPaymentBase": 40300,
+      "vtbCnyRate": 12.5,
+      "bankCommissionPercent": 2,
+      "paymentRubBeforeBank": 503750,
+      "bankCommissionRub": 10075,
+      "cnyPaymentRub": 513825,
+      "customsDutyRub": 533602,
+      "utilFeeRub": 5200,
+      "customsOperationFeeRub": 689,
+      "customsTotalRub": 539491,
+      "russiaExpensesRub": 223000,
+      "fixedRub": 250000,
+      "deliverySpbRub": 210000,
+      "finalPriceRub": 1736316
+    }
   },
   {
     "id": "59187649",
@@ -474,8 +556,9 @@
     "lastSeenAt": "2026-08-10T20:39:47.364Z",
     "status": "active",
     "finalPriceRub": null,
-    "pricingStatus": "waiting_vtb_rate",
-    "pricingError": "Нет курса ВТБ CNY/RUB"
+    "pricingStatus": "util_not_calculated",
+    "pricingError": "Мощность 224 л.с. выше лимита 159 л.с.",
+    "customsDutyRub": 667002
   },
   {
     "id": "59201794",
@@ -527,9 +610,49 @@
     "addedAt": "2026-08-10T20:40:00.023Z",
     "lastSeenAt": "2026-08-10T20:40:00.023Z",
     "status": "active",
-    "finalPriceRub": null,
-    "pricingStatus": "waiting_vtb_rate",
-    "pricingError": "Нет курса ВТБ CNY/RUB"
+    "finalPriceRub": 2142960,
+    "pricingStatus": "calculated",
+    "pricingError": null,
+    "pricingUpdatedAt": "2026-08-10T21:30:05.681Z",
+    "vtbCnyRate": 12.5,
+    "vtbRateSource": "GitHub variable VTB_CNY_RATE",
+    "cbrCnyRate": 12.2546,
+    "cbrEurRate": 95.286,
+    "chinaExpensesCny": 12500,
+    "cnyPaymentBase": 42300,
+    "bankCommissionRub": 10575,
+    "cnyPaymentRub": 539325,
+    "customsDutyRub": 914746,
+    "customsDutyEur": 9600,
+    "customsValueEur": 3832.54,
+    "customsAgeGroup": "over5",
+    "customsAgeSource": "registrationDate",
+    "customsAgeMonths": 151,
+    "utilFeeRub": 5200,
+    "utilCoeff": 0.26,
+    "customsOperationFeeRub": 689,
+    "customsTotalRub": 920635,
+    "russiaExpensesRub": 223000,
+    "fixedRub": 250000,
+    "deliverySpbRub": 210000,
+    "pricingBreakdown": {
+      "vehiclePriceCny": 29800,
+      "chinaExpensesCny": 12500,
+      "cnyPaymentBase": 42300,
+      "vtbCnyRate": 12.5,
+      "bankCommissionPercent": 2,
+      "paymentRubBeforeBank": 528750,
+      "bankCommissionRub": 10575,
+      "cnyPaymentRub": 539325,
+      "customsDutyRub": 914746,
+      "utilFeeRub": 5200,
+      "customsOperationFeeRub": 689,
+      "customsTotalRub": 920635,
+      "russiaExpensesRub": 223000,
+      "fixedRub": 250000,
+      "deliverySpbRub": 210000,
+      "finalPriceRub": 2142960
+    }
   },
   {
     "id": "59025549",
@@ -581,9 +704,49 @@
     "addedAt": "2026-08-10T20:40:13.680Z",
     "lastSeenAt": "2026-08-10T20:40:13.680Z",
     "status": "active",
-    "finalPriceRub": null,
-    "pricingStatus": "waiting_vtb_rate",
-    "pricingError": "Нет курса ВТБ CNY/RUB"
+    "finalPriceRub": 1361072,
+    "pricingStatus": "calculated",
+    "pricingError": null,
+    "pricingUpdatedAt": "2026-08-10T21:30:05.681Z",
+    "vtbCnyRate": 12.5,
+    "vtbRateSource": "GitHub variable VTB_CNY_RATE",
+    "cbrCnyRate": 12.2546,
+    "cbrEurRate": 95.286,
+    "chinaExpensesCny": 12500,
+    "cnyPaymentBase": 30300,
+    "bankCommissionRub": 7575,
+    "cnyPaymentRub": 386325,
+    "customsDutyRub": 285858,
+    "customsDutyEur": 3000,
+    "customsValueEur": 2289.23,
+    "customsAgeGroup": "over5",
+    "customsAgeSource": "registrationDate",
+    "customsAgeMonths": 96,
+    "utilFeeRub": 5200,
+    "utilCoeff": 0.26,
+    "customsOperationFeeRub": 689,
+    "customsTotalRub": 291747,
+    "russiaExpensesRub": 223000,
+    "fixedRub": 250000,
+    "deliverySpbRub": 210000,
+    "pricingBreakdown": {
+      "vehiclePriceCny": 17800,
+      "chinaExpensesCny": 12500,
+      "cnyPaymentBase": 30300,
+      "vtbCnyRate": 12.5,
+      "bankCommissionPercent": 2,
+      "paymentRubBeforeBank": 378750,
+      "bankCommissionRub": 7575,
+      "cnyPaymentRub": 386325,
+      "customsDutyRub": 285858,
+      "utilFeeRub": 5200,
+      "customsOperationFeeRub": 689,
+      "customsTotalRub": 291747,
+      "russiaExpensesRub": 223000,
+      "fixedRub": 250000,
+      "deliverySpbRub": 210000,
+      "finalPriceRub": 1361072
+    }
   },
   {
     "id": "59287779",
@@ -636,8 +799,8 @@
     "lastSeenAt": "2026-08-10T20:40:27.173Z",
     "status": "active",
     "finalPriceRub": null,
-    "pricingStatus": "waiting_vtb_rate",
-    "pricingError": "Нет курса ВТБ CNY/RUB"
+    "pricingStatus": "customs_not_calculated",
+    "pricingError": "Нет объёма двигателя"
   },
   {
     "id": "59243600",
@@ -690,8 +853,8 @@
     "lastSeenAt": "2026-08-10T20:41:12.625Z",
     "status": "active",
     "finalPriceRub": null,
-    "pricingStatus": "waiting_vtb_rate",
-    "pricingError": "Нет курса ВТБ CNY/RUB"
+    "pricingStatus": "customs_not_calculated",
+    "pricingError": "Нет объёма двигателя"
   },
   {
     "id": "59293644",
@@ -744,8 +907,9 @@
     "lastSeenAt": "2026-08-10T20:55:27.508Z",
     "status": "active",
     "finalPriceRub": null,
-    "pricingStatus": "waiting_vtb_rate",
-    "pricingError": "Нет курса ВТБ CNY/RUB"
+    "pricingStatus": "util_not_calculated",
+    "pricingError": "Мощность 180 л.с. выше лимита 159 л.с.",
+    "customsDutyRub": 1191075
   },
   {
     "id": "59284876",
@@ -798,8 +962,9 @@
     "lastSeenAt": "2026-08-10T20:56:00.893Z",
     "status": "active",
     "finalPriceRub": null,
-    "pricingStatus": "waiting_vtb_rate",
-    "pricingError": "Нет курса ВТБ CNY/RUB"
+    "pricingStatus": "util_not_calculated",
+    "pricingError": "Мощность 177 л.с. выше лимита 159 л.с.",
+    "customsDutyRub": 457373
   },
   {
     "id": "58966653",
@@ -852,8 +1017,8 @@
     "lastSeenAt": "2026-08-10T20:56:34.504Z",
     "status": "active",
     "finalPriceRub": null,
-    "pricingStatus": "waiting_vtb_rate",
-    "pricingError": "Нет курса ВТБ CNY/RUB"
+    "pricingStatus": "customs_not_calculated",
+    "pricingError": "Для чистого электромобиля нужен отдельный расчёт"
   },
   {
     "id": "59093833",
@@ -906,8 +1071,8 @@
     "lastSeenAt": "2026-08-10T20:57:19.741Z",
     "status": "active",
     "finalPriceRub": null,
-    "pricingStatus": "waiting_vtb_rate",
-    "pricingError": "Нет курса ВТБ CNY/RUB"
+    "pricingStatus": "customs_not_calculated",
+    "pricingError": "Нужна точная дата производства: автомобиль близко к границе таможенной возрастной группы"
   },
   {
     "id": "59293712",
@@ -959,9 +1124,49 @@
     "addedAt": "2026-08-10T20:57:53.211Z",
     "lastSeenAt": "2026-08-10T20:57:53.211Z",
     "status": "active",
-    "finalPriceRub": null,
-    "pricingStatus": "waiting_vtb_rate",
-    "pricingError": "Нет курса ВТБ CNY/RUB"
+    "finalPriceRub": 1956016,
+    "pricingStatus": "calculated",
+    "pricingError": null,
+    "pricingUpdatedAt": "2026-08-10T21:30:05.681Z",
+    "vtbCnyRate": 12.5,
+    "vtbRateSource": "GitHub variable VTB_CNY_RATE",
+    "cbrCnyRate": 12.2546,
+    "cbrEurRate": 95.286,
+    "chinaExpensesCny": 12500,
+    "cnyPaymentBase": 52300,
+    "bankCommissionRub": 13075,
+    "cnyPaymentRub": 666825,
+    "customsDutyRub": 600302,
+    "customsDutyEur": 6300,
+    "customsValueEur": 5118.62,
+    "customsAgeGroup": "over5",
+    "customsAgeSource": "registrationDate",
+    "customsAgeMonths": 122,
+    "utilFeeRub": 5200,
+    "utilCoeff": 0.26,
+    "customsOperationFeeRub": 689,
+    "customsTotalRub": 606191,
+    "russiaExpensesRub": 223000,
+    "fixedRub": 250000,
+    "deliverySpbRub": 210000,
+    "pricingBreakdown": {
+      "vehiclePriceCny": 39800,
+      "chinaExpensesCny": 12500,
+      "cnyPaymentBase": 52300,
+      "vtbCnyRate": 12.5,
+      "bankCommissionPercent": 2,
+      "paymentRubBeforeBank": 653750,
+      "bankCommissionRub": 13075,
+      "cnyPaymentRub": 666825,
+      "customsDutyRub": 600302,
+      "utilFeeRub": 5200,
+      "customsOperationFeeRub": 689,
+      "customsTotalRub": 606191,
+      "russiaExpensesRub": 223000,
+      "fixedRub": 250000,
+      "deliverySpbRub": 210000,
+      "finalPriceRub": 1956016
+    }
   },
   {
     "id": "59271932",
@@ -1014,8 +1219,9 @@
     "lastSeenAt": "2026-08-10T20:58:26.248Z",
     "status": "active",
     "finalPriceRub": null,
-    "pricingStatus": "waiting_vtb_rate",
-    "pricingError": "Нет курса ВТБ CNY/RUB"
+    "pricingStatus": "util_not_calculated",
+    "pricingError": "Мощность 163 л.с. выше лимита 159 л.с.",
+    "customsDutyRub": 396390
   },
   {
     "id": "59156662",
@@ -1068,8 +1274,9 @@
     "lastSeenAt": "2026-08-10T21:10:11.372Z",
     "status": "active",
     "finalPriceRub": null,
-    "pricingStatus": "waiting_vtb_rate",
-    "pricingError": "Нет курса ВТБ CNY/RUB"
+    "pricingStatus": "util_not_calculated",
+    "pricingError": "Мощность 173 л.с. выше лимита 159 л.с.",
+    "customsDutyRub": 396390
   },
   {
     "id": "59245147",
@@ -1122,8 +1329,9 @@
     "lastSeenAt": "2026-08-10T21:10:24.962Z",
     "status": "active",
     "finalPriceRub": null,
-    "pricingStatus": "waiting_vtb_rate",
-    "pricingError": "Нет курса ВТБ CNY/RUB"
+    "pricingStatus": "util_not_calculated",
+    "pricingError": "Мощность 188 л.с. выше лимита 159 л.с.",
+    "customsDutyRub": 1286361
   },
   {
     "id": "59130160",
@@ -1176,8 +1384,8 @@
     "lastSeenAt": "2026-08-10T21:10:39.008Z",
     "status": "active",
     "finalPriceRub": null,
-    "pricingStatus": "waiting_vtb_rate",
-    "pricingError": "Нет курса ВТБ CNY/RUB"
+    "pricingStatus": "customs_not_calculated",
+    "pricingError": "Для чистого электромобиля нужен отдельный расчёт"
   },
   {
     "id": "59142386",
@@ -1230,8 +1438,9 @@
     "lastSeenAt": "2026-08-10T21:11:13.660Z",
     "status": "active",
     "finalPriceRub": null,
-    "pricingStatus": "waiting_vtb_rate",
-    "pricingError": "Нет курса ВТБ CNY/RUB"
+    "pricingStatus": "util_not_calculated",
+    "pricingError": "Мощность 333 л.с. выше лимита 159 л.с.",
+    "customsDutyRub": 1429290
   },
   {
     "id": "59274464",
@@ -1284,8 +1493,9 @@
     "lastSeenAt": "2026-08-10T21:11:26.858Z",
     "status": "active",
     "finalPriceRub": null,
-    "pricingStatus": "waiting_vtb_rate",
-    "pricingError": "Нет курса ВТБ CNY/RUB"
+    "pricingStatus": "util_not_calculated",
+    "pricingError": "Мощность 173 л.с. выше лимита 159 л.с.",
+    "customsDutyRub": 514544
   },
   {
     "id": "59275245",
@@ -1338,7 +1548,8 @@
     "lastSeenAt": "2026-08-10T21:12:00.033Z",
     "status": "active",
     "finalPriceRub": null,
-    "pricingStatus": "waiting_vtb_rate",
-    "pricingError": "Нет курса ВТБ CNY/RUB"
+    "pricingStatus": "util_not_calculated",
+    "pricingError": "Мощность 189 л.с. выше лимита 159 л.с.",
+    "customsDutyRub": 714645
   }
 ]
