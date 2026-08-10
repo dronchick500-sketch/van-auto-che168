@@ -8,14 +8,29 @@ VAN AUTO — РАСЧЁТ ИТОГОВОЙ СТОИМОСТИ
 ==================================================
 */
 
+
 const CARS_FILE = 'cars.json';
 const RATES_FILE = 'rates.json';
+
+
+/*
+==================================================
+ИСТОЧНИКИ КУРСОВ
+==================================================
+*/
+
 
 const VTB_URL =
   'https://www.vtb.ru/personal/platezhi-i-perevody/obmen-valjuty/yuan/';
 
+
+const VTB_TRANSFER_URL =
+  'https://www.vtb.ru/personal/platezhi-i-perevody/perevody-v-yuani/';
+
+
 const CBR_URL =
   'https://www.cbr.ru/scripts/XML_daily.asp';
+
 
 
 /*
@@ -24,76 +39,69 @@ const CBR_URL =
 ==================================================
 */
 
-// Комиссия банка
+
+// Банковская комиссия 2%
 const BANK_COMMISSION = 0.02;
 
-// Постоянные расходы
+
+// Постоянная сумма на автомобиль
 const FIXED_RUB = 250000;
+
 
 // Доставка до Санкт-Петербурга
 const DELIVERY_SPB_RUB = 210000;
 
 
-// Порог стоимости автомобиля
+// Граница стоимости автомобиля
 const LOW_PRICE_LIMIT_CNY = 110000;
 
 
 // Расходы по Китаю
-
-// Авто до 110 000 ¥ включительно
 const CHINA_LOW_CNY = 12500;
-
-// Авто дороже 110 000 ¥
 const CHINA_HIGH_CNY = 13000;
 
 
-// Расходы по РФ
-
-// Авто до 110 000 ¥ включительно
+// Расходы по России
 const RUSSIA_LOW_RUB = 223000;
-
-// Авто дороже 110 000 ¥
 const RUSSIA_HIGH_RUB = 273000;
+
 
 
 /*
 ==================================================
-ТАМОЖНЯ / УТИЛЬ
+ТАМОЖЕННЫЕ НАСТРОЙКИ
 ==================================================
 */
 
-// Таможенный сбор за операции
+
 const CUSTOMS_OPERATION_FEE_RUB = 689;
 
 
-// Льготный утильсбор
+// Льготный утиль
 const UTIL_BASE_RUB = 20000;
-
 const UTIL_NEW_COEFF = 0.17;
-
 const UTIL_USED_COEFF = 0.26;
 
 
-// Для сайта льготными считаем только
-// автомобили максимум 159 л.с.
-//
-// Пользователь при этом видит:
+// На сайте написано:
 // "До 160 л.с."
+//
+// Фактически:
+// максимум 159 л.с.
 const SAFE_POWER_LIMIT_HP = 159;
 
 
-// Если точной даты производства нет,
-// не считаем автомобили слишком близко
-// к границе 3 и 5 лет.
+// Защита возле границы 3 и 5 лет
 const AGE_BOUNDARY_GUARD_MONTHS = 2;
 
 
 
 /*
 ==================================================
-РАБОТА С JSON
+JSON
 ==================================================
 */
+
 
 function loadJson(path, fallback) {
 
@@ -111,14 +119,13 @@ function loadJson(path, fallback) {
       )
     );
 
-  }
-
-  catch (error) {
+  } catch (error) {
 
     console.log(
       `Не удалось прочитать ${path}:`,
       error.message
     );
+
 
     return fallback;
 
@@ -127,16 +134,21 @@ function loadJson(path, fallback) {
 }
 
 
+
 function saveJson(path, data) {
 
   fs.writeFileSync(
+
     path,
+
     JSON.stringify(
       data,
       null,
       2
     ) + '\n',
+
     'utf8'
+
   );
 
 }
@@ -145,9 +157,10 @@ function saveJson(path, data) {
 
 /*
 ==================================================
-ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ
+ЧИСЛА
 ==================================================
 */
+
 
 function toNumber(value) {
 
@@ -160,18 +173,25 @@ function toNumber(value) {
   }
 
 
-  const n =
-    Number(
-      String(value)
-        .replace(',', '.')
-    );
+  const normalized =
+    String(value)
+
+      .replace(/\u00A0/g, '')
+      .replace(/\u202F/g, '')
+      .replace(/\s/g, '')
+      .replace(',', '.');
 
 
-  return Number.isFinite(n)
-    ? n
+  const number =
+    Number(normalized);
+
+
+  return Number.isFinite(number)
+    ? number
     : null;
 
 }
+
 
 
 function roundRub(value) {
@@ -184,14 +204,12 @@ function roundRub(value) {
 
 /*
 ==================================================
-КУРСЫ ЦБ РФ
+ЦБ РФ
 ==================================================
 */
 
-function parseCbrRate(
-  xml,
-  code
-) {
+
+function parseCbrRate(xml, code) {
 
   const blocks =
     xml.match(
@@ -232,17 +250,13 @@ function parseCbrRate(
 
     const nominal =
       nominalMatch
-        ? toNumber(
-            nominalMatch[1]
-          )
+        ? toNumber(nominalMatch[1])
         : null;
 
 
     const value =
       valueMatch
-        ? toNumber(
-            valueMatch[1]
-          )
+        ? toNumber(valueMatch[1])
         : null;
 
 
@@ -254,10 +268,7 @@ function parseCbrRate(
     }
 
 
-    return (
-      value /
-      nominal
-    );
+    return value / nominal;
 
   }
 
@@ -265,6 +276,7 @@ function parseCbrRate(
   return null;
 
 }
+
 
 
 async function getCbrRates() {
@@ -340,10 +352,8 @@ async function getCbrRates() {
 
 
   return {
-
     cnyRub,
     eurRub
-
   };
 
 }
@@ -352,9 +362,10 @@ async function getCbrRates() {
 
 /*
 ==================================================
-ПОИСК КУРСА ВТБ
+КАНДИДАТЫ КУРСА НА СТРАНИЦЕ ВТБ
 ==================================================
 */
+
 
 function extractRateCandidates(
   text,
@@ -369,49 +380,32 @@ function extractRateCandidates(
       .map(
         line =>
           line
-            .replace(
-              /\s+/g,
-              ' '
-            )
+            .replace(/\s+/g, ' ')
             .trim()
       )
 
       .filter(Boolean);
 
 
-  const indexes = [];
-
-
-  lines.forEach(
-    function (
-      line,
-      index
-    ) {
-
-      if (
-        /CNY|китайск.*юан|юан/i
-          .test(line)
-      ) {
-
-        indexes.push(
-          index
-        );
-
-      }
-
-    }
-  );
-
-
   const candidates = [];
-
-  const snippets = [];
 
 
   for (
-    const index
-    of indexes
+    let index = 0;
+    index < lines.length;
+    index++
   ) {
+
+    const line =
+      lines[index];
+
+
+    if (
+      !/CNY|юан|китайск/i.test(line)
+    ) {
+      continue;
+    }
+
 
     const start =
       Math.max(
@@ -423,76 +417,73 @@ function extractRateCandidates(
     const end =
       Math.min(
         lines.length,
-        index + 22
-      );
-
-
-    const windowLines =
-      lines.slice(
-        start,
-        end
+        index + 25
       );
 
 
     const snippet =
-      windowLines.join('\n');
+      lines
+        .slice(start, end)
+        .join('\n');
 
 
-    snippets.push(
-      snippet
-    );
-
+    /*
+    Сначала ищем цифру рядом
+    со словами продажи.
+    */
 
     const directPatterns = [
 
-      /(?:Продажа|Продать|курс продажи)[^\d]{0,100}(\d{1,2}[.,]\d{2,6})/i,
+      /(?:Продажа|Продать|курс продажи)[^\d]{0,120}(\d{1,2}[.,]\d{2,6})/i,
 
-      /(\d{1,2}[.,]\d{2,6})[^\d]{0,100}(?:Продажа|Продать|курс продажи)/i
+      /(\d{1,2}[.,]\d{2,6})[^\d]{0,120}(?:Продажа|Продать|курс продажи)/i
 
     ];
 
 
     for (
-      const regex
+      const pattern
       of directPatterns
     ) {
 
       const match =
-        snippet.match(
-          regex
+        snippet.match(pattern);
+
+
+      if (!match) {
+        continue;
+      }
+
+
+      const number =
+        toNumber(
+          match[1]
         );
 
 
-      if (match) {
+      if (
+        number &&
+        number >= cbrCnyRub * 0.75 &&
+        number <= cbrCnyRub * 1.70
+      ) {
 
-        const n =
-          toNumber(
-            match[1]
-          );
-
-
-        if (n) {
-
-          candidates.push({
-
-            value:
-              n,
-
-            priority:
-              3,
-
-            snippet
-
-          });
-
-        }
+        candidates.push({
+          value: number,
+          priority: 10
+        });
 
       }
 
     }
 
 
-    const numeric =
+    /*
+    Если явной подписи нет,
+    берём разумные значения
+    возле CNY.
+    */
+
+    const numbers =
       snippet.match(
         /\b\d{1,2}[.,]\d{2,6}\b/g
       ) || [];
@@ -500,36 +491,22 @@ function extractRateCandidates(
 
     for (
       const raw
-      of numeric
+      of numbers
     ) {
 
-      const n =
+      const number =
         toNumber(raw);
 
 
-      if (!n) {
-        continue;
-      }
-
-
       if (
-        n >=
-          cbrCnyRub * 0.75 &&
-
-        n <=
-          cbrCnyRub * 1.55
+        number &&
+        number >= cbrCnyRub * 0.75 &&
+        number <= cbrCnyRub * 1.70
       ) {
 
         candidates.push({
-
-          value:
-            n,
-
-          priority:
-            1,
-
-          snippet
-
+          value: number,
+          priority: 1
         });
 
       }
@@ -539,25 +516,26 @@ function extractRateCandidates(
   }
 
 
-  return {
-
-    candidates,
-    snippets
-
-  };
+  return candidates;
 
 }
 
 
 
-async function getVtbCnySellRate(
+/*
+==================================================
+ВТБ — ОСНОВНАЯ СТРАНИЦА
+==================================================
+*/
+
+
+async function tryVtbMainPage(
   browser,
-  cbrCnyRub,
-  previousRates
+  cbrCnyRub
 ) {
 
   console.log(
-    '\n===== КУРС ВТБ CNY =====\n'
+    '\nПробуем основную страницу курса ВТБ...'
   );
 
 
@@ -573,13 +551,8 @@ async function getVtbCnySellRate(
         'Chrome/126.0.0.0 Safari/537.36',
 
       viewport: {
-
-        width:
-          1440,
-
-        height:
-          1200
-
+        width: 1440,
+        height: 1200
       }
 
     });
@@ -592,21 +565,22 @@ async function getVtbCnySellRate(
   try {
 
     await page.goto(
-      VTB_URL,
-      {
 
+      VTB_URL,
+
+      {
         waitUntil:
           'domcontentloaded',
 
         timeout:
-          60000
-
+          45000
       }
+
     );
 
 
     await page.waitForTimeout(
-      8000
+      7000
     );
 
 
@@ -614,26 +588,22 @@ async function getVtbCnySellRate(
       await page
         .locator('body')
         .innerText({
-
           timeout:
             15000
-
         });
 
 
-    const result =
+    console.log(
+      'VTB main text length:',
+      text.length
+    );
+
+
+    const candidates =
       extractRateCandidates(
         text,
         cbrCnyRub
       );
-
-
-    const candidates =
-      result.candidates;
-
-
-    const snippets =
-      result.snippets;
 
 
     const preferred =
@@ -641,7 +611,7 @@ async function getVtbCnySellRate(
 
         .filter(
           item =>
-            item.priority === 3
+            item.priority === 10
         )
 
         .map(
@@ -681,6 +651,13 @@ async function getVtbCnySellRate(
       ordinary.length
     ) {
 
+      /*
+      Если нашли несколько разумных
+      банковских курсов рядом с CNY,
+      для покупки юаня выбираем
+      большее значение.
+      */
+
       rate =
         Math.max(
           ...ordinary
@@ -691,14 +668,12 @@ async function getVtbCnySellRate(
 
     if (
       rate &&
-      rate >=
-        cbrCnyRub * 0.75 &&
-      rate <=
-        cbrCnyRub * 1.55
+      rate >= cbrCnyRub * 0.75 &&
+      rate <= cbrCnyRub * 1.70
     ) {
 
       console.log(
-        'ВТБ CNY/RUB:',
+        'Курс ВТБ с основной страницы:',
         rate
       );
 
@@ -723,29 +698,14 @@ async function getVtbCnySellRate(
 
 
     console.log(
-      'Не удалось уверенно распознать курс ВТБ.'
+      'На основной странице ВТБ курс не распознан.'
     );
 
 
-    console.log(
-      (
-        snippets[0] ||
-        text.slice(
-          0,
-          2500
-        )
-      ).slice(
-        0,
-        2500
-      )
-    );
-
-  }
-
-  catch (error) {
+  } catch (error) {
 
     console.log(
-      'Ошибка ВТБ:',
+      'Ошибка основной страницы ВТБ:',
       error.message
     );
 
@@ -755,11 +715,362 @@ async function getVtbCnySellRate(
   await context.close();
 
 
+  return null;
+
+}
+
+
+
+/*
+==================================================
+ВТБ — СТРАНИЦА ПЕРЕВОДОВ В ЮАНЯХ
+==================================================
+*/
+
+
+async function tryVtbTransferPage(
+  browser,
+  cbrCnyRub
+) {
+
+  console.log(
+    '\nПробуем резервную страницу ВТБ...'
+  );
+
+
+  const context =
+    await browser.newContext({
+
+      locale:
+        'ru-RU',
+
+      userAgent:
+        'Mozilla/5.0 (Windows NT 10.0; Win64; x64) ' +
+        'AppleWebKit/537.36 (KHTML, like Gecko) ' +
+        'Chrome/126.0.0.0 Safari/537.36',
+
+      viewport: {
+        width: 1440,
+        height: 1200
+      }
+
+    });
+
+
+  const page =
+    await context.newPage();
+
+
+  try {
+
+    await page.goto(
+
+      VTB_TRANSFER_URL,
+
+      {
+        waitUntil:
+          'domcontentloaded',
+
+        timeout:
+          45000
+      }
+
+    );
+
+
+    await page.waitForTimeout(
+      6000
+    );
+
+
+    let text =
+      await page
+        .locator('body')
+        .innerText({
+          timeout:
+            15000
+        });
+
+
+    text =
+      String(text)
+
+        .replace(
+          /\u00A0/g,
+          ' '
+        )
+
+        .replace(
+          /\u202F/g,
+          ' '
+        );
+
+
+    console.log(
+      'VTB transfer text length:',
+      text.length
+    );
+
+
+    /*
+    ВТБ сейчас использует пример вида:
+
+    20 млн ₽ ≈ 1 447 345 юаней
+
+    Поэтому:
+    курс = RUB / CNY
+    */
+
+
+    let rubAmount =
+      null;
+
+
+    let cnyAmount =
+      null;
+
+
+
+    /*
+    Вариант:
+    20 млн ₽ ≈ 1 447 345 юаней
+    */
+
+    const millionMatch =
+      text.match(
+
+        /(\d+(?:[.,]\d+)?)\s*млн\.?\s*₽[\s\S]{0,80}?([\d\s]+)\s*(?:юан|CNY)/i
+
+      );
+
+
+    if (
+      millionMatch
+    ) {
+
+      rubAmount =
+
+        Number(
+          millionMatch[1]
+            .replace(
+              ',',
+              '.'
+            )
+        ) *
+
+        1000000;
+
+
+      cnyAmount =
+
+        Number(
+          millionMatch[2]
+            .replace(
+              /\s/g,
+              ''
+            )
+        );
+
+    }
+
+
+
+    /*
+    Вариант:
+    20 000 000 ₽ ≈ 1 447 345 юаней
+    */
+
+    if (
+      !rubAmount ||
+      !cnyAmount
+    ) {
+
+      const fullMatch =
+        text.match(
+
+          /([\d\s]{5,})\s*₽[\s\S]{0,80}?([\d\s]{4,})\s*(?:юан|CNY)/i
+
+        );
+
+
+      if (
+        fullMatch
+      ) {
+
+        rubAmount =
+
+          Number(
+            fullMatch[1]
+              .replace(
+                /\s/g,
+                ''
+              )
+          );
+
+
+        cnyAmount =
+
+          Number(
+            fullMatch[2]
+              .replace(
+                /\s/g,
+                ''
+              )
+          );
+
+      }
+
+    }
+
+
+
+    if (
+      rubAmount &&
+      cnyAmount
+    ) {
+
+      const rate =
+        rubAmount /
+        cnyAmount;
+
+
+      console.log(
+        'ВТБ RUB amount:',
+        rubAmount
+      );
+
+
+      console.log(
+        'ВТБ CNY amount:',
+        cnyAmount
+      );
+
+
+      console.log(
+        'Расчётный курс:',
+        rate
+      );
+
+
+      if (
+        rate >= cbrCnyRub * 0.75 &&
+        rate <= cbrCnyRub * 1.70
+      ) {
+
+        await context.close();
+
+
+        return {
+
+          rate,
+
+          source:
+            'VTB transfer page',
+
+          observedAt:
+            new Date()
+              .toISOString()
+
+        };
+
+      }
+
+    }
+
+
+    console.log(
+      'На резервной странице ВТБ курс не распознан.'
+    );
+
+
+    console.log(
+      text
+        .slice(
+          0,
+          3000
+        )
+    );
+
+
+  } catch (error) {
+
+    console.log(
+      'Ошибка резервной страницы ВТБ:',
+      error.message
+    );
+
+  }
+
+
+  await context.close();
+
+
+  return null;
+
+}
+
+
+
+/*
+==================================================
+ПОЛУЧЕНИЕ КУРСА ВТБ
+==================================================
+*/
+
+
+async function getVtbCnySellRate(
+  browser,
+  cbrCnyRub,
+  previousRates
+) {
+
+  console.log(
+    '\n===== КУРС ВТБ CNY/RUB =====\n'
+  );
+
+
   /*
-  Если ВТБ временно не открылся,
-  используем последний сохранённый
-  курс не старше 48 часов.
+  1. Основная страница ВТБ
   */
+
+  const main =
+    await tryVtbMainPage(
+      browser,
+      cbrCnyRub
+    );
+
+
+  if (main) {
+
+    return main;
+
+  }
+
+
+  /*
+  2. Резервная официальная
+  страница ВТБ.
+  */
+
+  const transfer =
+    await tryVtbTransferPage(
+      browser,
+      cbrCnyRub
+    );
+
+
+  if (transfer) {
+
+    return transfer;
+
+  }
+
+
+  /*
+  3. Последний сохранённый курс,
+  если он не старше 48 часов.
+  */
+
 
   const previousRate =
     toNumber(
@@ -803,7 +1114,7 @@ async function getVtbCnySellRate(
     ) {
 
       console.log(
-        'Используем сохранённый курс ВТБ:',
+        'Используем последний сохранённый курс ВТБ:',
         previousRate
       );
 
@@ -825,6 +1136,15 @@ async function getVtbCnySellRate(
     }
 
   }
+
+
+  /*
+  Никаких придуманных курсов.
+  */
+
+  console.log(
+    'Курс ВТБ получить не удалось.'
+  );
 
 
   return {
@@ -850,9 +1170,8 @@ async function getVtbCnySellRate(
 ==================================================
 */
 
-function parseYearMonth(
-  value
-) {
+
+function parseYearMonth(value) {
 
   if (!value) {
     return null;
@@ -861,7 +1180,9 @@ function parseYearMonth(
 
   const match =
     String(value)
+
       .trim()
+
       .match(
         /(20\d{2})[.\-/年](\d{1,2})/
       );
@@ -896,25 +1217,15 @@ function parseYearMonth(
 
 
   return {
-
     year,
     month
-
   };
 
 }
 
 
 
-function getAgeInfo(
-  car
-) {
-
-  /*
-  Сначала ищем реальную дату выпуска.
-  Если её нет — используем
-  первую регистрацию.
-  */
+function getAgeInfo(car) {
 
   const production =
     parseYearMonth(
@@ -1010,29 +1321,34 @@ function getAgeInfo(
 
   const source =
     production
+
       ? 'productionDate'
+
       : 'registrationDate';
 
 
   /*
-  Если используем только первую регистрацию
-  и автомобиль около границы 3/5 лет,
-  итог не показываем.
+  Если точной даты производства нет,
+  защищаем границу возрастных категорий.
   */
 
   if (!production) {
 
     const near3 =
+
       Math.abs(
         ageMonths - 36
       ) <=
+
       AGE_BOUNDARY_GUARD_MONTHS;
 
 
     const near5 =
+
       Math.abs(
         ageMonths - 60
       ) <=
+
       AGE_BOUNDARY_GUARD_MONTHS;
 
 
@@ -1085,9 +1401,10 @@ function getAgeInfo(
 
 /*
 ==================================================
-ТАМОЖНЯ: АВТО ДО 3 ЛЕТ
+ТАМОЖНЯ — ДО 3 ЛЕТ
 ==================================================
 */
+
 
 function dutyForUnder3(
   valueEur,
@@ -1095,7 +1412,6 @@ function dutyForUnder3(
 ) {
 
   let percent;
-
   let minPerCc;
 
 
@@ -1186,9 +1502,10 @@ function dutyForUnder3(
 
 /*
 ==================================================
-ТАМОЖНЯ: АВТО 3–5 ЛЕТ
+ТАМОЖНЯ — 3–5 ЛЕТ
 ==================================================
 */
+
 
 function ccRateFor3to5(
   engineCc
@@ -1237,9 +1554,10 @@ function ccRateFor3to5(
 
 /*
 ==================================================
-ТАМОЖНЯ: АВТО СТАРШЕ 5 ЛЕТ
+ТАМОЖНЯ — СТАРШЕ 5 ЛЕТ
 ==================================================
 */
+
 
 function ccRateForOver5(
   engineCc
@@ -1292,6 +1610,7 @@ function ccRateForOver5(
 ==================================================
 */
 
+
 function calculateCustomsDutyRub(
   car,
   cbr
@@ -1325,8 +1644,7 @@ function calculateCustomsDutyRub(
 
 
   /*
-  Чистые электромобили пока
-  автоматически не считаем.
+  Чистые EV пока отдельно.
   */
 
   if (
@@ -1476,9 +1794,10 @@ function calculateCustomsDutyRub(
 
 /*
 ==================================================
-РАСЧЁТ УТИЛЬСБОРА
+УТИЛЬ
 ==================================================
 */
+
 
 function calculateUtilFeeRub(
   car,
@@ -1507,13 +1826,11 @@ function calculateUtilFeeRub(
 
 
   /*
-  ВАЖНО:
+  В интерфейсе:
+  До 160 л.с.
 
-  На сайте пользователь видит
-  "До 160 л.с."
-
-  Но фактическая граница:
-  максимум 159 л.с.
+  Фактически:
+  до 159 включительно.
   */
 
   if (
@@ -1589,6 +1906,7 @@ function calculateUtilFeeRub(
 ==================================================
 */
 
+
 function calculateCarPrice(
   car,
   rates
@@ -1601,7 +1919,7 @@ function calculateCarPrice(
 
 
   /*
-  Нет цены автомобиля
+  Нет китайской цены
   */
 
   if (!priceCny) {
@@ -1625,7 +1943,7 @@ function calculateCarPrice(
 
 
   /*
-  Нет курса ВТБ
+  Нет ВТБ
   */
 
   if (
@@ -1715,11 +2033,13 @@ function calculateCarPrice(
   }
 
 
+
   /*
   ==============================================
   РАСХОДЫ ПО КИТАЮ
   ==============================================
   */
+
 
   const chinaExpensesCny =
 
@@ -1731,11 +2051,13 @@ function calculateCarPrice(
       : CHINA_HIGH_CNY;
 
 
+
   /*
   ==============================================
   РАСХОДЫ ПО РФ
   ==============================================
   */
+
 
   const russiaExpensesRub =
 
@@ -1747,18 +2069,16 @@ function calculateCarPrice(
       : RUSSIA_HIGH_RUB;
 
 
+
   /*
   ==============================================
-  ОПЛАТА В КИТАЕ
+  СУММА В ЮАНЯХ
 
-  Цена машины
-  + расходы Китай
-
-  Затем переводим по курсу ВТБ.
-
-  После этого начисляем 2%.
+  Цена автомобиля
+  + расходы по Китаю
   ==============================================
   */
+
 
   const cnyPaymentBase =
 
@@ -1766,29 +2086,54 @@ function calculateCarPrice(
     chinaExpensesCny;
 
 
+
+  /*
+  ==============================================
+  ПЕРЕВОД В РУБЛИ ПО ВТБ
+  ==============================================
+  */
+
+
   const paymentRubBeforeBank =
 
     cnyPaymentBase *
+
     rates.vtbCnySell;
+
+
+
+  /*
+  ==============================================
+  +2% КОМИССИЯ БАНКА
+
+  Начисляется именно на:
+  автомобиль + Китай
+  ==============================================
+  */
 
 
   const bankCommissionRub =
 
     paymentRubBeforeBank *
+
     BANK_COMMISSION;
+
 
 
   const cnyPaymentRub =
 
     paymentRubBeforeBank +
+
     bankCommissionRub;
+
 
 
   /*
   ==============================================
-  ТАМОЖЕННЫЕ РАСХОДЫ
+  ТАМОЖНЯ
   ==============================================
   */
+
 
   const customsTotalRub =
 
@@ -1799,18 +2144,20 @@ function calculateCarPrice(
     CUSTOMS_OPERATION_FEE_RUB;
 
 
+
   /*
   ==============================================
-  ФИНАЛЬНАЯ СТОИМОСТЬ
+  ИТОГОВАЯ СТОИМОСТЬ
 
-  Оплата авто + Китай
-  + 2% банк
+  Китай по ВТБ
+  + 2%
   + таможня
   + расходы РФ
-  + 250 000 ₽
-  + 210 000 ₽ доставка до Санкт-Петербурга
+  + 250 000
+  + 210 000 доставка до СПб
   ==============================================
   */
+
 
   const finalPriceRub =
     roundRub(
@@ -1828,11 +2175,13 @@ function calculateCarPrice(
     );
 
 
+
   /*
   ==============================================
-  СОХРАНЯЕМ ВСЮ РАСШИФРОВКУ
+  ЗАПИСЫВАЕМ РЕЗУЛЬТАТ
   ==============================================
   */
+
 
   return {
 
@@ -1841,46 +2190,59 @@ function calculateCarPrice(
 
     finalPriceRub,
 
+
     pricingStatus:
       'calculated',
 
+
     pricingError:
       null,
+
 
     pricingUpdatedAt:
       new Date()
         .toISOString(),
 
 
+
     /*
     Курсы
     */
 
+
     vtbCnyRate:
       rates.vtbCnySell,
+
 
     vtbRateSource:
       rates.vtbSource,
 
+
     cbrCnyRate:
       rates.cbr.cnyRub,
 
+
     cbrEurRate:
       rates.cbr.eurRub,
+
 
 
     /*
     Китай
     */
 
+
     chinaExpensesCny,
 
+
     cnyPaymentBase,
+
 
     bankCommissionRub:
       roundRub(
         bankCommissionRub
       ),
+
 
     cnyPaymentRub:
       roundRub(
@@ -1888,12 +2250,15 @@ function calculateCarPrice(
       ),
 
 
+
     /*
     Таможня
     */
 
+
     customsDutyRub:
       customs.dutyRub,
+
 
     customsDutyEur:
       Number(
@@ -1901,98 +2266,128 @@ function calculateCarPrice(
           .toFixed(2)
       ),
 
+
     customsValueEur:
       Number(
         customs.customsValueEur
           .toFixed(2)
       ),
 
+
     customsAgeGroup:
       customs.age.group,
+
 
     customsAgeSource:
       customs.age.source,
 
+
     customsAgeMonths:
       customs.age.ageMonths,
+
 
 
     /*
     Утиль
     */
 
+
     utilFeeRub:
       util.feeRub,
 
+
     utilCoeff:
       util.coeff,
+
 
 
     /*
     Остальные расходы
     */
 
+
     customsOperationFeeRub:
       CUSTOMS_OPERATION_FEE_RUB,
 
+
     customsTotalRub,
 
+
     russiaExpensesRub,
+
 
     fixedRub:
       FIXED_RUB,
 
+
     deliverySpbRub:
       DELIVERY_SPB_RUB,
+
 
 
     /*
     Полная расшифровка
     */
 
+
     pricingBreakdown: {
+
 
       vehiclePriceCny:
         priceCny,
 
+
       chinaExpensesCny,
 
+
       cnyPaymentBase,
+
 
       vtbCnyRate:
         rates.vtbCnySell,
 
+
       bankCommissionPercent:
         2,
+
 
       bankCommissionRub:
         roundRub(
           bankCommissionRub
         ),
 
+
       cnyPaymentRub:
         roundRub(
           cnyPaymentRub
         ),
 
+
       customsDutyRub:
         customs.dutyRub,
+
 
       utilFeeRub:
         util.feeRub,
 
+
       customsOperationFeeRub:
         CUSTOMS_OPERATION_FEE_RUB,
 
+
       customsTotalRub,
 
+
       russiaExpensesRub,
+
 
       fixedRub:
         FIXED_RUB,
 
+
       deliverySpbRub:
         DELIVERY_SPB_RUB,
+
 
       finalPriceRub
 
@@ -2010,11 +2405,9 @@ function calculateCarPrice(
 ==================================================
 */
 
+
 (async () => {
 
-  /*
-  Проверяем cars.json
-  */
 
   if (
     !fs.existsSync(
@@ -2029,6 +2422,7 @@ function calculateCarPrice(
   }
 
 
+
   const cars =
     loadJson(
       CARS_FILE,
@@ -2036,11 +2430,13 @@ function calculateCarPrice(
     );
 
 
+
   const previousRates =
     loadJson(
       RATES_FILE,
       {}
     );
+
 
 
   if (
@@ -2056,17 +2452,21 @@ function calculateCarPrice(
   }
 
 
+
   /*
-  Получаем ЦБ
+  ЦБ
   */
+
 
   const cbr =
     await getCbrRates();
 
 
+
   /*
-  Получаем ВТБ
+  ВТБ
   */
+
 
   const browser =
     await chromium.launch({
@@ -2075,6 +2475,7 @@ function calculateCarPrice(
         true
 
     });
+
 
 
   const vtb =
@@ -2089,31 +2490,40 @@ function calculateCarPrice(
     );
 
 
+
   await browser.close();
 
 
+
   /*
-  Сохраняем курсы
+  rates.json
   */
 
+
   const rates = {
+
 
     updatedAt:
       new Date()
         .toISOString(),
 
+
     cbr,
+
 
     vtbCnySell:
       vtb.rate,
 
+
     vtbSource:
       vtb.source,
+
 
     vtbObservedAt:
       vtb.observedAt
 
   };
+
 
 
   saveJson(
@@ -2122,23 +2532,29 @@ function calculateCarPrice(
   );
 
 
+
   /*
-  Считаем все машины
+  Рассчитываем машины
   */
+
 
   const pricedCars =
     cars.map(
+
       car =>
         calculateCarPrice(
           car,
           rates
         )
+
     );
 
 
+
   /*
-  Перезаписываем cars.json
+  Сохраняем cars.json
   */
+
 
   saveJson(
     CARS_FILE,
@@ -2146,26 +2562,35 @@ function calculateCarPrice(
   );
 
 
+
   /*
   Статистика
   */
 
+
   const calculated =
+
     pricedCars.filter(
+
       car =>
         car.finalPriceRub
+
     ).length;
+
 
 
   const waiting =
 
     pricedCars.length -
+
     calculated;
+
 
 
   console.log(
     '\n===== РАСЧЁТ VAN AUTO ГОТОВ =====\n'
   );
+
 
 
   console.log(
@@ -2174,10 +2599,12 @@ function calculateCarPrice(
   );
 
 
+
   console.log(
     'С итоговой ценой ₽:',
     calculated
   );
+
 
 
   console.log(
@@ -2186,7 +2613,9 @@ function calculateCarPrice(
   );
 
 
+
   pricedCars.forEach(
+
     function (car) {
 
       console.log(
@@ -2204,6 +2633,8 @@ function calculateCarPrice(
       );
 
     }
+
   );
+
 
 })();
