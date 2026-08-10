@@ -8,42 +8,118 @@ const fs = require('fs');
   const url =
     `https://pcm.che168.com/2023/cardetail_rn/index?infoid=${CAR_ID}&pvareaid=108991`;
 
+
+  const strategies = [
+
+    {
+      name: 'desktop',
+
+      userAgent:
+        'Mozilla/5.0 (Windows NT 10.0; Win64; x64) ' +
+        'AppleWebKit/537.36 (KHTML, like Gecko) ' +
+        'Chrome/126.0.0.0 Safari/537.36',
+
+      viewport: {
+        width: 1440,
+        height: 1200
+      },
+
+      locale: 'zh-CN'
+    },
+
+
+    {
+      name: 'mobile',
+
+      userAgent:
+        'Mozilla/5.0 (iPhone; CPU iPhone OS 17_5 like Mac OS X) ' +
+        'AppleWebKit/605.1.15 (KHTML, like Gecko) ' +
+        'Version/17.5 Mobile/15E148 Safari/604.1',
+
+      viewport: {
+        width: 390,
+        height: 844
+      },
+
+      locale: 'zh-CN'
+    },
+
+
+    {
+      name: 'crawler',
+
+      userAgent:
+        'Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)',
+
+      viewport: {
+        width: 1440,
+        height: 1200
+      },
+
+      locale: 'zh-CN'
+    }
+
+  ];
+
+
   const browser = await chromium.launch({
     headless: true
   });
 
-  const context = await browser.newContext({
-    locale: 'zh-CN',
-    userAgent:
-      'Mozilla/5.0 (Windows NT 10.0; Win64; x64) ' +
-      'AppleWebKit/537.36 (KHTML, like Gecko) ' +
-      'Chrome/126.0.0.0 Safari/537.36',
-    viewport: {
-      width: 1440,
-      height: 1200
-    }
-  });
 
-  const page = await context.newPage();
-
-  console.log('Открываем CHE168...');
+  let successfulResult = null;
 
 
-async function openChe168() {
+  for (const strategy of strategies) {
 
-  let lastError = null;
+    console.log(
+      `\n===== ПРОБУЕМ: ${strategy.name} =====\n`
+    );
 
-  for (let attempt = 1; attempt <= 3; attempt++) {
+
+    const context = await browser.newContext({
+
+      locale: strategy.locale,
+
+      userAgent: strategy.userAgent,
+
+      viewport: strategy.viewport,
+
+      timezoneId: 'Asia/Shanghai',
+
+      extraHTTPHeaders: {
+        'Accept-Language':
+          'zh-CN,zh;q=0.9,en;q=0.7',
+
+        'Referer':
+          'https://www.che168.com/'
+      }
+
+    });
+
+
+    const page = await context.newPage();
+
+
+    /*
+      Слегка приближаем браузер
+      к обычному пользовательскому.
+    */
+
+    await page.addInitScript(() => {
+
+      Object.defineProperty(
+        navigator,
+        'webdriver',
+        {
+          get: () => undefined
+        }
+      );
+
+    });
+
 
     try {
-
-      console.log(`Попытка ${attempt} из 3`);
-
-      /*
-        Не ждём DOMContentLoaded.
-        Нам достаточно получить ответ CHE168
-        и начать загрузку документа.
-      */
 
       await page.goto(url, {
         waitUntil: 'commit',
@@ -51,127 +127,240 @@ async function openChe168() {
       });
 
 
-      /*
-        Даём странице выполнить JavaScript
-        и подгрузить информацию автомобиля.
-      */
-
-      await page.waitForTimeout(10000);
+      await page.waitForTimeout(12000);
 
 
-      const body = page.locator('body');
-
-      const currentText = await body.innerText({
-        timeout: 15000
-      });
+      const title =
+        await page.title();
 
 
-      console.log(
-        `Получено текста: ${currentText.length} символов`
-      );
+      const finalUrl =
+        page.url();
 
 
-      /*
-        На нормальной карточке CHE168
-        должны присутствовать хотя бы
-        ключевые элементы автомобиля.
-      */
+      let text = '';
 
-      if (
-        currentText.length > 1000 &&
-        (
-          currentText.includes('上牌时间') ||
-          currentText.includes('表显里程') ||
-          currentText.includes('发动机排量')
-        )
-      ) {
+      try {
 
-        console.log('Карточка CHE168 загружена');
+        text =
+          await page.locator('body').innerText({
+            timeout: 10000
+          });
 
-        return currentText;
+      } catch (error) {
+
+        text = '';
 
       }
 
 
-      throw new Error(
-        'Страница открылась, но данные автомобиля ещё не появились'
+      const html =
+        await page.content();
+
+
+      console.log(
+        'TITLE:',
+        JSON.stringify(title)
       );
+
+      console.log(
+        'FINAL URL:',
+        finalUrl
+      );
+
+      console.log(
+        'TEXT LENGTH:',
+        text.length
+      );
+
+      console.log(
+        '\n----- ТЕКСТ СТРАНИЦЫ -----\n'
+      );
+
+      console.log(
+        JSON.stringify(
+          text.slice(0, 1500)
+        )
+      );
+
+
+      /*
+        Сохраняем диагностику
+        для КАЖДОЙ стратегии.
+      */
+
+      fs.writeFileSync(
+        `debug-${strategy.name}.html`,
+        html,
+        'utf8'
+      );
+
+
+      fs.writeFileSync(
+        `debug-${strategy.name}.txt`,
+        text,
+        'utf8'
+      );
+
+
+      await page.screenshot({
+        path:
+          `debug-${strategy.name}.png`,
+        fullPage: true
+      });
+
+
+      /*
+        Проверяем,
+        получили ли настоящую карточку.
+      */
+
+      const isRealCarPage =
+
+        text.length > 1000 &&
+
+        (
+          text.includes('上牌时间') ||
+          text.includes('表显里程') ||
+          text.includes('发动机排量')
+        );
+
+
+      if (isRealCarPage) {
+
+        console.log(
+          `\nУСПЕХ: ${strategy.name}\n`
+        );
+
+
+        successfulResult = {
+          page,
+          context,
+          text,
+          html,
+          strategy: strategy.name
+        };
+
+
+        break;
+
+      }
 
 
     } catch (error) {
 
-      lastError = error;
-
       console.log(
-        `Попытка ${attempt} не удалась: ${error.message}`
+        'Ошибка стратегии:',
+        strategy.name
       );
 
-
-      if (attempt < 3) {
-
-        console.log('Ждём 5 секунд и пробуем снова...');
-
-        await page.waitForTimeout(5000);
-
-      }
+      console.log(
+        error.message
+      );
 
     }
+
+
+    await context.close();
 
   }
 
 
-  throw lastError;
+  /*
+    Если ни одна стратегия
+    не получила карточку —
+    НЕ роняем workflow.
 
-}
+    Нам нужны сохранённые
+    txt/html/png для диагностики.
+  */
+
+  if (!successfulResult) {
+
+    console.log(
+      '\n===== КАРТОЧКА НЕ ПОЛУЧЕНА =====\n'
+    );
+
+    console.log(
+      'Диагностика сохранена.'
+    );
 
 
-const text = await openChe168();
+    await browser.close();
 
-const html = await page.content();
+    process.exit(0);
 
-  /* ==============================
-     ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ
-     ============================== */
+  }
+
+
+  const {
+    page,
+    context,
+    text,
+    html,
+    strategy
+  } = successfulResult;
+
+
+  console.log(
+    '\n===== НАЧИНАЕМ ПАРСИНГ =====\n'
+  );
+
 
   function firstMatch(regex, source = text) {
-    const match = source.match(regex);
-    return match ? match[1].trim() : null;
+
+    const match =
+      source.match(regex);
+
+    return match
+      ? match[1].trim()
+      : null;
+
   }
 
+
   function numberOrNull(value) {
-    if (value === null || value === undefined) {
+
+    if (
+      value === null ||
+      value === undefined
+    ) {
+
       return null;
+
     }
 
-    const n = Number(value);
+
+    const n =
+      Number(value);
+
 
     return Number.isFinite(n)
       ? n
       : null;
+
   }
 
 
-  /* ==============================
-     НАЗВАНИЕ
-     ============================== */
+  /* НАЗВАНИЕ */
 
   let name =
-    firstMatch(/好车\s+([^\n]+?)\s+投诉/);
+    firstMatch(
+      /好车\s+([^\n]+?)\s+投诉/
+    );
+
 
   if (!name) {
+
     name =
       firstMatch(
         /(奥迪[^\n]{2,80})/
       );
+
   }
 
 
-  /* ==============================
-     ЦЕНА АВТОМОБИЛЯ
-
-     Берём именно главную цену
-     перед "新车含税价"
-     ============================== */
+  /* ЦЕНА */
 
   const priceWan =
     numberOrNull(
@@ -180,28 +369,16 @@ const html = await page.content();
       )
     );
 
+
   const priceCny =
     priceWan !== null
-      ? Math.round(priceWan * 10000)
+      ? Math.round(
+          priceWan * 10000
+        )
       : null;
 
 
-  /* ==============================
-     ЦЕНА НОВОЙ МАШИНЫ
-     НЕ ИСПОЛЬЗУЕМ В РАСЧЁТЕ
-     ============================== */
-
-  const newPriceWan =
-    numberOrNull(
-      firstMatch(
-        /新车含税价[：:]\s*(\d+(?:\.\d+)?)\s*万/
-      )
-    );
-
-
-  /* ==============================
-     ДАТА РЕГИСТРАЦИИ
-     ============================== */
+  /* РЕГИСТРАЦИЯ */
 
   const registrationDate =
     firstMatch(
@@ -211,14 +388,13 @@ const html = await page.content();
 
   const year =
     registrationDate
-      ? Number(registrationDate.slice(0, 4))
+      ? Number(
+          registrationDate.slice(0, 4)
+        )
       : null;
 
 
-  /* ==============================
-     ПРОБЕГ
-     4.35万 км → 43 500 км
-     ============================== */
+  /* ПРОБЕГ */
 
   const mileageWan =
     numberOrNull(
@@ -227,15 +403,16 @@ const html = await page.content();
       )
     );
 
+
   const mileage =
     mileageWan !== null
-      ? Math.round(mileageWan * 10000)
+      ? Math.round(
+          mileageWan * 10000
+        )
       : null;
 
 
-  /* ==============================
-     ОБЪЁМ
-     ============================== */
+  /* ОБЪЁМ */
 
   const engineVolume =
     numberOrNull(
@@ -244,15 +421,16 @@ const html = await page.content();
       )
     );
 
+
   const engineVolumeCc =
     engineVolume !== null
-      ? Math.round(engineVolume * 1000)
+      ? Math.round(
+          engineVolume * 1000
+        )
       : null;
 
 
-  /* ==============================
-     КОРОБКА
-     ============================== */
+  /* КОРОБКА */
 
   const transmissionCn =
     firstMatch(
@@ -261,18 +439,24 @@ const html = await page.content();
 
 
   const transmissionMap = {
+
     '自动': 'Автомат',
+
     '手动': 'Механика'
+
   };
 
+
   const transmission =
-    transmissionMap[transmissionCn]
+
+    transmissionMap[
+      transmissionCn
+    ]
+
     || transmissionCn;
 
 
-  /* ==============================
-     ПРИВОД
-     ============================== */
+  /* ПРИВОД */
 
   const driveCn =
     firstMatch(
@@ -281,21 +465,35 @@ const html = await page.content();
 
 
   const driveMap = {
-    '前置前驱': 'Передний',
-    '前置后驱': 'Задний',
-    '前置四驱': 'Полный',
-    '中置后驱': 'Задний',
-    '后置后驱': 'Задний'
+
+    '前置前驱':
+      'Передний',
+
+    '前置后驱':
+      'Задний',
+
+    '前置四驱':
+      'Полный',
+
+    '中置后驱':
+      'Задний',
+
+    '后置后驱':
+      'Задний'
+
   };
 
+
   const drive =
-    driveMap[driveCn]
+
+    driveMap[
+      driveCn
+    ]
+
     || driveCn;
 
 
-  /* ==============================
-     ТОПЛИВО
-     ============================== */
+  /* ТОПЛИВО */
 
   const fuelCn =
     firstMatch(
@@ -304,67 +502,83 @@ const html = await page.content();
 
 
   const fuelMap = {
-    '汽油': 'Бензин',
-    '柴油': 'Дизель',
-    '纯电动': 'Электро',
-    '插电式混合动力': 'Гибрид',
-    '油电混合': 'Гибрид'
+
+    '汽油':
+      'Бензин',
+
+    '柴油':
+      'Дизель',
+
+    '纯电动':
+      'Электро',
+
+    '插电式混合动力':
+      'Гибрид',
+
+    '油电混合':
+      'Гибрид'
+
   };
 
+
   const fuel =
-    fuelMap[fuelCn]
+
+    fuelMap[
+      fuelCn
+    ]
+
     || fuelCn;
 
 
-  /* ==============================
-     ЭКОЛОГИЧЕСКИЙ СТАНДАРТ
-     ============================== */
-
-  const emission =
-    firstMatch(
-      /([^\n]+)\s*\n\s*排放标准/
-    );
-
-
-  /* ==============================
-     РЕГИОН
-     ============================== */
-
-  const location =
-    firstMatch(
-      /([^\n]+)\s*\n\s*所在地区/
-    );
-
-
-  /* ==============================
-     МОЩНОСТЬ
-
-     Ищем несколькими способами.
-     ============================== */
+  /* МОЩНОСТЬ */
 
   const powerCandidates = [];
 
+
   const powerPatterns = [
+
     /最大马力[^0-9]{0,30}(\d{2,4})/g,
+
     /(\d{2,4})\s*马力/g,
+
     /"horsepower"\s*:\s*"?(\d{2,4})/g,
+
     /"maxHorsepower"\s*:\s*"?(\d{2,4})/g
+
   ];
 
-  for (const regex of powerPatterns) {
+
+  for (
+    const regex
+    of powerPatterns
+  ) {
 
     let match;
 
-    while ((match = regex.exec(html)) !== null) {
 
-      const value = Number(match[1]);
+    while (
+      (
+        match =
+          regex.exec(html)
+      ) !== null
+    ) {
+
+      const value =
+        Number(match[1]);
+
 
       if (
         value >= 50 &&
         value <= 1500 &&
-        !powerCandidates.includes(value)
+        !powerCandidates.includes(
+          value
+        )
       ) {
-        powerCandidates.push(value);
+
+        powerCandidates.push(
+          value
+        );
+
       }
 
     }
@@ -374,93 +588,100 @@ const html = await page.content();
 
   let power = null;
 
-  if (powerCandidates.length === 1) {
-    power = powerCandidates[0];
+
+  if (
+    powerCandidates.length === 1
+  ) {
+
+    power =
+      powerCandidates[0];
+
   }
 
 
-  /* ==============================
-     ФОТОГРАФИИ
-     ============================== */
+  /* ФОТО */
 
   const rawImages =
-    await page.locator('img').evaluateAll(
-      images => images.map(img =>
-        img.currentSrc ||
-        img.src ||
-        img.dataset.src ||
-        img.dataset.original ||
-        ''
-      )
-    );
+    await page
+      .locator('img')
+      .evaluateAll(
+        images =>
+          images.map(
+            img =>
+              img.currentSrc ||
+              img.src ||
+              img.dataset.src ||
+              img.dataset.original ||
+              ''
+          )
+      );
 
 
   const photos = [
+
     ...new Set(
+
       rawImages
         .filter(Boolean)
-        .filter(src =>
-          src.includes('autoimg')
-          || src.includes('che168')
+        .filter(
+          src =>
+            src.includes(
+              'autoimg'
+            )
+            ||
+            src.includes(
+              'che168'
+            )
         )
+
     )
+
   ];
 
-
-  /* ==============================
-     ЛЬГОТНЫЙ ФИЛЬТР МОЩНОСТИ
-
-     UI: "До 160 л.с."
-     Фактически: <=159
-     ============================== */
-
-  const preferentialPower =
-    power !== null
-      ? power <= 159
-      : null;
-
-
-  /* ==============================
-     ГОТОВЫЙ ОБЪЕКТ
-     ============================== */
 
   const car = {
 
     id: CAR_ID,
 
-    source: 'CHE168',
+    source:
+      'CHE168',
 
-    sourceUrl: url,
+    strategy,
+
+    sourceUrl:
+      url,
 
     name,
 
     priceWan,
+
     priceCny,
 
-    newPriceWan,
-
     registrationDate,
+
     year,
 
     mileage,
 
     engineVolume,
+
     engineVolumeCc,
 
     power,
+
     powerCandidates,
 
-    preferentialPower,
+    preferentialPower:
+
+      power !== null
+        ? power <= 159
+        : null,
 
     transmission,
 
     drive,
 
     fuel,
-
-    emission,
-
-    location,
 
     photosCount:
       photos.length,
@@ -472,37 +693,37 @@ const html = await page.content();
 
 
   fs.writeFileSync(
+
     'car.json',
-    JSON.stringify(car, null, 2),
+
+    JSON.stringify(
+      car,
+      null,
+      2
+    ),
+
     'utf8'
+
   );
-
-
-  fs.writeFileSync(
-    'che168.html',
-    html,
-    'utf8'
-  );
-
-
-  await page.screenshot({
-    path: 'che168.png',
-    fullPage: true
-  });
 
 
   console.log(
     '\n===== ГОТОВЫЙ АВТОМОБИЛЬ =====\n'
   );
 
+
   console.log(
+
     JSON.stringify(
       car,
       null,
       2
     )
+
   );
 
+
+  await context.close();
 
   await browser.close();
 
