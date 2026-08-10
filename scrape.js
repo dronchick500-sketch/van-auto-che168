@@ -1,46 +1,22 @@
 const { chromium } = require('playwright');
 const fs = require('fs');
 
+const LIST_PAGES = 2;
 
-/*
-==================================================
-VAN AUTO — CHE168 SCRAPER
+// За один запуск добавляем максимум 6 новых машин
+const MAX_NEW_CARS_PER_RUN = 6;
 
-Пока тестируем на одной машине.
-Позже сюда автоматически пойдёт список ID.
-==================================================
-*/
+// Дополнительно повторяем получение цены
+// для двух машин, у которых цена ранее не загрузилась
+const MAX_PRICE_RETRIES_PER_RUN = 2;
 
-const CAR_IDS = [
-  '59231822'
-];
+// Пока ограничиваем тестовый каталог 50 машинами
+const CATALOG_LIMIT = 50;
 
-
-/*
-Последняя цена, которую мы УЖЕ реально получили
-с китайской страницы CHE168 в успешном тесте.
-
-Нужна только для первого запуска, если CHE168
-снова временно не отдаст китайскую страницу.
-После появления cars.json данные будут
-сохраняться между запусками автоматически.
-*/
-
-const BOOTSTRAP_PRICES = {
-  '59231822': 185000
-};
-
-
-
-/* ==================================================
-   ОБЩИЕ ФУНКЦИИ
-   ================================================== */
 
 function firstMatch(text, regex) {
 
-  if (!text) {
-    return null;
-  }
+  if (!text) return null;
 
   const match = text.match(regex);
 
@@ -50,75 +26,44 @@ function firstMatch(text, regex) {
 }
 
 
-function numberOrNull(value) {
+function cleanName(value) {
+
+  if (!value) return null;
+
+  const parts =
+    value
+      .replace(/\s+/g, ' ')
+      .trim()
+      .split(' ');
+
+
+  /*
+  Audi Audi Q3 -> Audi Q3
+  BMW BMW X3 -> BMW X3
+  */
 
   if (
-    value === null ||
-    value === undefined ||
-    value === ''
+    parts.length > 1 &&
+    parts[0].toLowerCase() ===
+    parts[1].toLowerCase()
   ) {
-    return null;
+
+    parts.splice(1, 1);
+
   }
 
-  const n = Number(value);
 
-  return Number.isFinite(n)
-    ? n
-    : null;
+  return parts.join(' ');
 }
 
-
-function loadSavedCars() {
-
-  if (!fs.existsSync('cars.json')) {
-    return [];
-  }
-
-  try {
-
-    const data = JSON.parse(
-      fs.readFileSync(
-        'cars.json',
-        'utf8'
-      )
-    );
-
-    return Array.isArray(data)
-      ? data
-      : [];
-
-  } catch (error) {
-
-    console.log(
-      'Не удалось прочитать старый cars.json:',
-      error.message
-    );
-
-    return [];
-  }
-}
-
-
-
-/* ==================================================
-   НОРМАЛИЗАЦИЯ
-   ================================================== */
 
 function normalizeFuel(value) {
 
-  if (!value) {
-    return null;
-  }
+  if (!value) return null;
 
-  const v = value.toLowerCase();
+  const v =
+    value.toLowerCase();
 
-  if (v.includes('gasoline')) {
-    return 'Бензин';
-  }
-
-  if (v.includes('diesel')) {
-    return 'Дизель';
-  }
 
   if (
     v.includes('plug-in') ||
@@ -127,9 +72,27 @@ function normalizeFuel(value) {
     return 'Гибрид';
   }
 
-  if (v.includes('electric')) {
+
+  if (
+    v.includes('electric')
+  ) {
     return 'Электро';
   }
+
+
+  if (
+    v.includes('diesel')
+  ) {
+    return 'Дизель';
+  }
+
+
+  if (
+    v.includes('gasoline')
+  ) {
+    return 'Бензин';
+  }
+
 
   return value;
 }
@@ -137,11 +100,11 @@ function normalizeFuel(value) {
 
 function normalizeTransmission(value) {
 
-  if (!value) {
-    return null;
-  }
+  if (!value) return null;
 
-  const v = value.toLowerCase();
+  const v =
+    value.toLowerCase();
+
 
   if (
     v.includes('dual-clutch') ||
@@ -151,9 +114,13 @@ function normalizeTransmission(value) {
     return 'Робот';
   }
 
-  if (v.includes('cvt')) {
+
+  if (
+    v.includes('cvt')
+  ) {
     return 'Вариатор';
   }
+
 
   if (
     v.includes('automatic') ||
@@ -162,9 +129,13 @@ function normalizeTransmission(value) {
     return 'Автомат';
   }
 
-  if (v.includes('manual')) {
+
+  if (
+    v.includes('manual')
+  ) {
     return 'Механика';
   }
+
 
   return value;
 }
@@ -172,11 +143,11 @@ function normalizeTransmission(value) {
 
 function normalizeDrive(value) {
 
-  if (!value) {
-    return null;
-  }
+  if (!value) return null;
 
-  const v = value.toLowerCase();
+  const v =
+    value.toLowerCase();
+
 
   if (
     v.includes('front-wheel') ||
@@ -185,12 +156,14 @@ function normalizeDrive(value) {
     return 'Передний';
   }
 
+
   if (
     v.includes('rear-wheel') ||
     v.includes('rwd')
   ) {
     return 'Задний';
   }
+
 
   if (
     v.includes('all-wheel') ||
@@ -201,17 +174,18 @@ function normalizeDrive(value) {
     return 'Полный';
   }
 
+
   return value;
 }
 
 
 function normalizeBody(value) {
 
-  if (!value) {
-    return null;
-  }
+  if (!value) return null;
 
-  const v = value.toLowerCase();
+  const v =
+    value.toLowerCase();
+
 
   if (
     v.includes('suv') ||
@@ -220,9 +194,13 @@ function normalizeBody(value) {
     return 'Кроссовер';
   }
 
-  if (v.includes('sedan')) {
+
+  if (
+    v.includes('sedan')
+  ) {
     return 'Седан';
   }
+
 
   if (
     v.includes('mpv') ||
@@ -231,12 +209,14 @@ function normalizeBody(value) {
     return 'Минивэн';
   }
 
+
   if (
     v.includes('hatchback') ||
     v.includes('hatch')
   ) {
     return 'Хэтчбек';
   }
+
 
   if (
     v.includes('wagon') ||
@@ -245,35 +225,350 @@ function normalizeBody(value) {
     return 'Универсал';
   }
 
-  if (v.includes('coupe')) {
+
+  if (
+    v.includes('coupe')
+  ) {
     return 'Купе';
   }
+
+
+  if (
+    v.includes('pickup')
+  ) {
+    return 'Пикап';
+  }
+
 
   return value;
 }
 
 
+function loadSavedCars() {
 
-/* ==================================================
-   GLOBAL.CHE168
-   ХАРАКТЕРИСТИКИ + МОЩНОСТЬ + ФОТО
-   ================================================== */
+  if (
+    !fs.existsSync('cars.json')
+  ) {
+    return [];
+  }
 
-async function scrapeGlobalCar(browser, id) {
+
+  try {
+
+    const data =
+      JSON.parse(
+        fs.readFileSync(
+          'cars.json',
+          'utf8'
+        )
+      );
+
+
+    return Array.isArray(data)
+      ? data
+      : [];
+
+  }
+
+  catch (error) {
+
+    console.log(
+      'Не удалось прочитать cars.json:',
+      error.message
+    );
+
+
+    return [];
+  }
+}
+
+
+function uniqueCarPhotos(rawImages) {
+
+  const seen =
+    new Set();
+
+  const preferred = [];
+  const fallback = [];
+
+
+  for (
+    const src
+    of rawImages
+  ) {
+
+    if (
+      !src ||
+      !src.includes('autoimg')
+    ) {
+      continue;
+    }
+
+
+    let clean =
+      src;
+
+
+    try {
+
+      const u =
+        new URL(src);
+
+      u.search = '';
+
+      clean =
+        u.toString();
+
+    }
+
+    catch (_) {}
+
+
+    if (
+      seen.has(clean)
+    ) {
+      continue;
+    }
+
+
+    seen.add(clean);
+
+
+    /*
+    1400x0 — фотографии основной
+    галереи автомобиля.
+    */
+
+    if (
+      clean.includes('1400x0_')
+    ) {
+
+      preferred.push(clean);
+
+    }
+
+    else {
+
+      fallback.push(clean);
+
+    }
+
+  }
+
+
+  /*
+  Если нормальной большой галереи нет,
+  используем остальные autoimg.
+  */
+
+  return (
+    preferred.length >= 3
+      ? preferred
+      : preferred.concat(fallback)
+  ).slice(0, 20);
+}
+
+
+
+/*
+==================================================
+ПОИСК НОВЫХ ID
+==================================================
+*/
+
+async function discoverCarIds(browser) {
+
+  console.log(
+    '\n===== ПОИСК НОВЫХ ОБЪЯВЛЕНИЙ =====\n'
+  );
+
+
+  const context =
+    await browser.newContext({
+
+      locale:
+        'en-US',
+
+      userAgent:
+        'Mozilla/5.0 (Windows NT 10.0; Win64; x64) ' +
+        'AppleWebKit/537.36 (KHTML, like Gecko) ' +
+        'Chrome/126.0.0.0 Safari/537.36',
+
+      viewport: {
+        width: 1440,
+        height: 1200
+      }
+
+    });
+
+
+  const page =
+    await context.newPage();
+
+
+  const ids = [];
+
+  const seen =
+    new Set();
+
+
+  for (
+    let pageNumber = 1;
+    pageNumber <= LIST_PAGES;
+    pageNumber++
+  ) {
+
+    /*
+    sort=4 = новые объявления
+    */
+
+    const url =
+      `https://global.che168.com/en/used-cars?sort=4&page=${pageNumber}`;
+
+
+    try {
+
+      console.log(
+        `Список: страница ${pageNumber}`
+      );
+
+
+      await page.goto(
+        url,
+        {
+          waitUntil:
+            'domcontentloaded',
+
+          timeout:
+            45000
+        }
+      );
+
+
+      await page.waitForTimeout(
+        3000
+      );
+
+
+      /*
+      Берём все ссылки вида:
+
+      /en/detail/59231822
+      */
+
+      const hrefs =
+        await page
+          .locator(
+            'a[href*="/en/detail/"]'
+          )
+          .evaluateAll(
+
+            links =>
+              links.map(
+                link =>
+                  link.href ||
+                  link.getAttribute('href') ||
+                  ''
+              )
+
+          );
+
+
+      for (
+        const href
+        of hrefs
+      ) {
+
+        const match =
+          String(href).match(
+            /\/en\/detail\/(\d+)/
+          );
+
+
+        if (!match) {
+          continue;
+        }
+
+
+        const id =
+          match[1];
+
+
+        if (
+          seen.has(id)
+        ) {
+          continue;
+        }
+
+
+        seen.add(id);
+
+        ids.push(id);
+
+      }
+
+
+      console.log(
+        `Найдено ID после страницы ${pageNumber}: ${ids.length}`
+      );
+
+    }
+
+    catch (error) {
+
+      console.log(
+        `Не удалось прочитать страницу ${pageNumber}: ${error.message}`
+      );
+
+    }
+
+  }
+
+
+  await context.close();
+
+
+  console.log(
+    `Всего уникальных ID: ${ids.length}`
+  );
+
+
+  return ids;
+}
+
+
+
+/*
+==================================================
+GLOBAL CHE168
+ХАРАКТЕРИСТИКИ
+==================================================
+*/
+
+async function scrapeGlobalCar(
+  browser,
+  id
+) {
 
   const url =
     `https://global.che168.com/en/detail/${id}`;
 
 
-  let lastError = null;
+  let lastError =
+    null;
 
 
-  for (let attempt = 1; attempt <= 2; attempt++) {
+  for (
+    let attempt = 1;
+    attempt <= 2;
+    attempt++
+  ) {
 
     const context =
       await browser.newContext({
 
-        locale: 'en-US',
+        locale:
+          'en-US',
 
         userAgent:
           'Mozilla/5.0 (Windows NT 10.0; Win64; x64) ' +
@@ -302,14 +597,17 @@ async function scrapeGlobalCar(browser, id) {
       await page.goto(
         url,
         {
-          waitUntil: 'domcontentloaded',
-          timeout: 45000
+          waitUntil:
+            'domcontentloaded',
+
+          timeout:
+            45000
         }
       );
 
 
       await page.waitForTimeout(
-        4000
+        3500
       );
 
 
@@ -317,7 +615,8 @@ async function scrapeGlobalCar(browser, id) {
         await page
           .locator('body')
           .innerText({
-            timeout: 15000
+            timeout:
+              15000
           });
 
 
@@ -327,22 +626,27 @@ async function scrapeGlobalCar(browser, id) {
       ) {
 
         throw new Error(
-          'Global CHE168 вернул слишком мало данных'
+          'слишком мало данных'
         );
+
       }
 
 
-      /* ------------------------------
-         НАЗВАНИЕ
-         ------------------------------ */
+      /*
+      НАЗВАНИЕ
+      */
 
-      let name = null;
+      let name =
+        null;
 
 
       try {
 
         const h1 =
-          page.locator('h1').first();
+          page
+            .locator('h1')
+            .first();
+
 
         if (
           await h1.count()
@@ -355,23 +659,18 @@ async function scrapeGlobalCar(browser, id) {
 
         }
 
-      } catch (_) {}
-
-
-      if (!name) {
-
-        name =
-          firstMatch(
-            text,
-            /#?\s*(Audi[^\n]+)/i
-          );
-
       }
 
+      catch (_) {}
 
-      /* ------------------------------
-         РЕГИСТРАЦИЯ
-         ------------------------------ */
+
+      name =
+        cleanName(name);
+
+
+      /*
+      ГОД
+      */
 
       const registrationDate =
         firstMatch(
@@ -383,14 +682,17 @@ async function scrapeGlobalCar(browser, id) {
       const year =
         registrationDate
           ? Number(
-              registrationDate.slice(0, 4)
+              registrationDate.slice(
+                0,
+                4
+              )
             )
           : null;
 
 
-      /* ------------------------------
-         ПРОБЕГ
-         ------------------------------ */
+      /*
+      ПРОБЕГ
+      */
 
       const mileageRaw =
         firstMatch(
@@ -410,29 +712,36 @@ async function scrapeGlobalCar(browser, id) {
           : null;
 
 
-      /* ------------------------------
-         ДВИГАТЕЛЬ + МОЩНОСТЬ
-
-         Например:
-         1.4T 150HP L4
-         ------------------------------ */
+      /*
+      ДВИГАТЕЛЬ И МОЩНОСТЬ
+      */
 
       const engineMatch =
         text.match(
-          /Engine \(cc\)\s*([0-9.]+[TL]?)\s*(\d+)\s*HP/i
+          /Engine \(cc\)\s*([0-9.]+[TL]?)\s*(\d+)\s*(?:HP|PS)/i
         );
 
 
-      let engine = null;
-      let engineVolume = null;
-      let engineVolumeCc = null;
-      let power = null;
+      let engine =
+        null;
+
+      let engineVolume =
+        null;
+
+      let engineVolumeCc =
+        null;
+
+      let power =
+        null;
 
 
-      if (engineMatch) {
+      if (
+        engineMatch
+      ) {
 
         engine =
           engineMatch[1];
+
 
         power =
           Number(
@@ -446,7 +755,9 @@ async function scrapeGlobalCar(browser, id) {
           );
 
 
-        if (volumeMatch) {
+        if (
+          volumeMatch
+        ) {
 
           engineVolume =
             Number(
@@ -456,17 +767,14 @@ async function scrapeGlobalCar(browser, id) {
 
           engineVolumeCc =
             Math.round(
-              engineVolume * 1000
+              engineVolume *
+              1000
             );
 
         }
 
       }
 
-
-      /* ------------------------------
-         ТОПЛИВО
-         ------------------------------ */
 
       const fuelRaw =
         firstMatch(
@@ -475,20 +783,12 @@ async function scrapeGlobalCar(browser, id) {
         );
 
 
-      /* ------------------------------
-         КОРОБКА
-         ------------------------------ */
-
       const transmissionRaw =
         firstMatch(
           text,
           /Trans\.\s*([^\n]+)/i
         );
 
-
-      /* ------------------------------
-         ПРИВОД
-         ------------------------------ */
 
       const driveRaw =
         firstMatch(
@@ -497,10 +797,6 @@ async function scrapeGlobalCar(browser, id) {
         );
 
 
-      /* ------------------------------
-         КУЗОВ
-         ------------------------------ */
-
       const bodyRaw =
         firstMatch(
           text,
@@ -508,43 +804,34 @@ async function scrapeGlobalCar(browser, id) {
         );
 
 
-      /* ------------------------------
-         ФОТО
-         ------------------------------ */
+      /*
+      ФОТО
+      */
 
       const rawImages =
         await page
           .locator('img')
           .evaluateAll(
+
             images =>
               images.map(
+
                 img =>
                   img.currentSrc ||
                   img.src ||
                   img.dataset.src ||
+                  img.dataset.original ||
                   ''
+
               )
+
           );
 
 
-      const photos = [
-
-        ...new Set(
-
+      const photos =
+        uniqueCarPhotos(
           rawImages
-
-            .filter(Boolean)
-
-            .filter(
-              src =>
-                src.includes(
-                  'autoimg'
-                )
-            )
-
-        )
-
-      ];
+        );
 
 
       await context.close();
@@ -579,8 +866,13 @@ async function scrapeGlobalCar(browser, id) {
 
         power,
 
-        preferentialPower:
+        /*
+        ВАЖНО:
+        160 л.с. не включаем.
+        Только до 159 включительно.
+        */
 
+        preferentialPower:
           power !== null
             ? power <= 159
             : null,
@@ -611,15 +903,16 @@ async function scrapeGlobalCar(browser, id) {
         photosCount:
           photos.length,
 
-        photos:
-          photos.slice(0, 20)
+        photos
 
       };
 
+    }
 
-    } catch (error) {
+    catch (error) {
 
-      lastError = error;
+      lastError =
+        error;
 
 
       console.log(
@@ -630,14 +923,18 @@ async function scrapeGlobalCar(browser, id) {
       await context.close();
 
 
-      if (attempt < 2) {
+      if (
+        attempt < 2
+      ) {
 
         await new Promise(
+
           resolve =>
             setTimeout(
               resolve,
-              3000
+              2500
             )
+
         );
 
       }
@@ -652,10 +949,11 @@ async function scrapeGlobalCar(browser, id) {
 
 
 
-/* ==================================================
-   КИТАЙСКИЙ CHE168
-   ТОЛЬКО ЦЕНА В ЮАНЯХ
-   ================================================== */
+/*
+==================================================
+КИТАЙСКАЯ ЦЕНА
+==================================================
+*/
 
 async function scrapeChinaPrice(
   browser,
@@ -753,14 +1051,17 @@ async function scrapeChinaPrice(
       await page.goto(
         url,
         {
-          waitUntil: 'commit',
-          timeout: 22000
+          waitUntil:
+            'commit',
+
+          timeout:
+            20000
         }
       );
 
 
       await page.waitForTimeout(
-        7000
+        6500
       );
 
 
@@ -768,9 +1069,15 @@ async function scrapeChinaPrice(
         await page
           .locator('body')
           .innerText({
-            timeout: 10000
+            timeout:
+              9000
           });
 
+
+      /*
+      Цена непосредственно перед
+      新车含税价
+      */
 
       const priceMatch =
         text.match(
@@ -778,7 +1085,9 @@ async function scrapeChinaPrice(
         );
 
 
-      if (priceMatch) {
+      if (
+        priceMatch
+      ) {
 
         const priceWan =
           Number(
@@ -788,7 +1097,8 @@ async function scrapeChinaPrice(
 
         const priceCny =
           Math.round(
-            priceWan * 10000
+            priceWan *
+            10000
           );
 
 
@@ -806,8 +1116,12 @@ async function scrapeChinaPrice(
 
           priceWan,
 
-          strategy:
-            strategy.name,
+          priceSource:
+            'CHE168 live',
+
+          priceUpdatedAt:
+            new Date()
+              .toISOString(),
 
           chinaUrl:
             url
@@ -816,13 +1130,9 @@ async function scrapeChinaPrice(
 
       }
 
+    }
 
-      console.log(
-        `PRICE ${id}: цена не найдена`
-      );
-
-
-    } catch (error) {
+    catch (error) {
 
       console.log(
         `PRICE ${id} ${strategy.name}: ${error.message}`
@@ -844,7 +1154,10 @@ async function scrapeChinaPrice(
     priceWan:
       null,
 
-    strategy:
+    priceSource:
+      null,
+
+    priceUpdatedAt:
       null,
 
     chinaUrl:
@@ -855,9 +1168,11 @@ async function scrapeChinaPrice(
 
 
 
-/* ==================================================
-   ЗАПУСК
-   ================================================== */
+/*
+==================================================
+ЗАПУСК
+==================================================
+*/
 
 (async () => {
 
@@ -865,272 +1180,321 @@ async function scrapeChinaPrice(
     loadSavedCars();
 
 
-  const savedById =
+  const carsById =
     new Map(
+
       savedCars.map(
+
         car => [
           String(car.id),
           car
         ]
+
       )
+
     );
 
 
   const browser =
     await chromium.launch({
-      headless: true
+      headless:
+        true
     });
 
 
-  const result = [];
+  try {
+
+    /*
+    1. Получаем свежие объявления
+    */
+
+    const discoveredIds =
+      await discoverCarIds(
+        browser
+      );
 
 
-  for (
-    const id
-    of CAR_IDS
-  ) {
+    /*
+    2. Сколько ещё мест осталось
+    до 50 машин
+    */
+
+    const freeSlots =
+      Math.max(
+        0,
+        CATALOG_LIMIT -
+        savedCars.length
+      );
+
+
+    /*
+    3. Берём только машины,
+    которых ещё нет в cars.json
+    */
+
+    const newIds =
+      discoveredIds
+
+        .filter(
+          id =>
+            !carsById.has(id)
+        )
+
+        .slice(
+          0,
+          Math.min(
+            MAX_NEW_CARS_PER_RUN,
+            freeSlots
+          )
+        );
+
+
+    /*
+    4. Машины без цены
+    пробуем повторно
+    */
+
+    const retryPriceIds =
+      savedCars
+
+        .filter(
+          car =>
+            car.priceCny === null ||
+            car.priceCny === undefined
+        )
+
+        .map(
+          car =>
+            String(car.id)
+        )
+
+        .slice(
+          0,
+          MAX_PRICE_RETRIES_PER_RUN
+        );
+
 
     console.log(
-      '\n================================'
+      '\n===== ПЛАН ЭТОГО ЗАПУСКА ====='
     );
+
 
     console.log(
-      `АВТОМОБИЛЬ ${id}`
+      'Новых машин:',
+      newIds.length,
+      newIds
     );
+
 
     console.log(
-      '================================\n'
+      'Повтор цены:',
+      retryPriceIds.length,
+      retryPriceIds
     );
 
 
-    const previous =
-      savedById.get(
-        String(id)
-      ) || null;
+    /*
+    5. Добавляем новые машины
+    */
+
+    for (
+      const id
+      of newIds
+    ) {
+
+      console.log(
+        `\n===== НОВАЯ МАШИНА ${id} =====`
+      );
 
 
-    let details = null;
+      try {
+
+        const details =
+          await scrapeGlobalCar(
+            browser,
+            id
+          );
 
 
-    try {
+        const price =
+          await scrapeChinaPrice(
+            browser,
+            id
+          );
 
-      details =
-        await scrapeGlobalCar(
+
+        carsById.set(
+
+          id,
+
+          {
+
+            ...details,
+
+            chinaUrl:
+              price.chinaUrl,
+
+            priceWan:
+              price.priceWan,
+
+            priceCny:
+              price.priceCny,
+
+            priceSource:
+              price.priceSource,
+
+            priceUpdatedAt:
+              price.priceUpdatedAt,
+
+            addedAt:
+              new Date()
+                .toISOString(),
+
+            lastSeenAt:
+              new Date()
+                .toISOString(),
+
+            status:
+              'active'
+
+          }
+
+        );
+
+      }
+
+      catch (error) {
+
+        console.log(
+          `Машина ${id} пропущена: ${error.message}`
+        );
+
+      }
+
+    }
+
+
+    /*
+    6. Повторно пробуем
+    получить цены
+    */
+
+    for (
+      const id
+      of retryPriceIds
+    ) {
+
+      if (
+        newIds.includes(id)
+      ) {
+        continue;
+      }
+
+
+      console.log(
+        `\n===== ПОВТОР ЦЕНЫ ${id} =====`
+      );
+
+
+      const previous =
+        carsById.get(id);
+
+
+      if (
+        !previous
+      ) {
+        continue;
+      }
+
+
+      const price =
+        await scrapeChinaPrice(
           browser,
           id
         );
 
 
-    } catch (error) {
-
-      console.log(
-        `Не удалось получить характеристики ${id}:`,
-        error.message
-      );
-
-
-      /*
-      Если сегодня CHE168 полностью лежит,
-      не удаляем автомобиль из нашей базы.
-      */
-
-      if (previous) {
-
-        console.log(
-          'Сохраняем предыдущую версию автомобиля.'
-        );
-
-        result.push(
-          previous
-        );
-
-        continue;
-
-      }
-
-
-      console.log(
-        'Предыдущей версии нет — пропускаем.'
-      );
-
-      continue;
-
-    }
-
-
-    /*
-    -----------------------------------
-    ПЫТАЕМСЯ ПОЛУЧИТЬ НОВУЮ ЦЕНУ
-    -----------------------------------
-    */
-
-    const livePrice =
-      await scrapeChinaPrice(
-        browser,
-        id
-      );
-
-
-    /*
-    -----------------------------------
-    ВЫБИРАЕМ ЦЕНУ
-
-    Приоритет:
-    1. новая цена CHE168
-    2. сохранённая цена cars.json
-    3. последний успешный тест
-    -----------------------------------
-    */
-
-    let priceCny = null;
-
-    let priceSource = null;
-
-    let priceUpdatedAt =
-      previous?.priceUpdatedAt || null;
-
-
-    if (
-      livePrice.priceCny !== null
-    ) {
-
-      priceCny =
-        livePrice.priceCny;
-
-      priceSource =
-        'CHE168 live';
-
-
-      /*
-      Дату меняем только если цена
-      реально изменилась или её раньше не было.
-      */
-
       if (
-        !previous ||
-        previous.priceCny !== priceCny
+        price.priceCny !== null
       ) {
 
-        priceUpdatedAt =
-          new Date().toISOString();
+        carsById.set(
+
+          id,
+
+          {
+
+            ...previous,
+
+            chinaUrl:
+              price.chinaUrl,
+
+            priceWan:
+              price.priceWan,
+
+            priceCny:
+              price.priceCny,
+
+            priceSource:
+              price.priceSource,
+
+            priceUpdatedAt:
+              price.priceUpdatedAt
+
+          }
+
+        );
 
       }
 
     }
 
-    else if (
-      previous &&
-      previous.priceCny !== null &&
-      previous.priceCny !== undefined
-    ) {
-
-      priceCny =
-        previous.priceCny;
-
-      priceSource =
-        'saved';
-
-    }
-
-    else if (
-      BOOTSTRAP_PRICES[id]
-    ) {
-
-      priceCny =
-        BOOTSTRAP_PRICES[id];
-
-      priceSource =
-        'last successful test';
-
-    }
-
-
-    const priceWan =
-      priceCny !== null
-        ? priceCny / 10000
-        : null;
-
 
     /*
-    Сохраняем предыдущие дополнительные поля,
-    но свежие характеристики имеют приоритет.
+    7. Сохраняем всю базу
     */
 
-    const car = {
-
-      ...(previous || {}),
-
-      ...details,
-
-      chinaUrl:
-        livePrice.chinaUrl,
-
-      priceWan,
-
-      priceCny,
-
-      priceSource,
-
-      priceUpdatedAt
-
-    };
+    const result =
+      Array.from(
+        carsById.values()
+      );
 
 
-    result.push(
-      car
-    );
+    fs.writeFileSync(
 
+      'cars.json',
 
-    console.log(
-      '\nГОТОВЫЙ АВТОМОБИЛЬ:\n'
-    );
-
-
-    console.log(
       JSON.stringify(
-        car,
+        result,
         null,
         2
-      )
+      ) + '\n',
+
+      'utf8'
+
+    );
+
+
+    console.log(
+      '\n================================'
+    );
+
+
+    console.log(
+      `cars.json сохранён. Всего машин: ${result.length}`
+    );
+
+
+    console.log(
+      '================================\n'
     );
 
   }
 
+  finally {
 
-  await browser.close();
+    await browser.close();
 
-
-  /*
-  ==========================================
-  СОХРАНЯЕМ БАЗУ
-  ==========================================
-  */
-
-  fs.writeFileSync(
-
-    'cars.json',
-
-    JSON.stringify(
-      result,
-      null,
-      2
-    ) + '\n',
-
-    'utf8'
-
-  );
-
-
-  console.log(
-    '\n================================'
-  );
-
-  console.log(
-    `cars.json сохранён. Машин: ${result.length}`
-  );
-
-  console.log(
-    '================================\n'
-  );
+  }
 
 })();
