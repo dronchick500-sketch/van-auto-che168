@@ -1,7 +1,25 @@
-name: CHE168 test
+name: CHE168 catalog
 
 on:
+
+  # Можно запускать вручную
   workflow_dispatch:
+
+  # Автоматическое обновление раз в час
+  schedule:
+    - cron: '23 * * * *'
+
+
+# Разрешаем workflow обновлять cars.json
+permissions:
+  contents: write
+
+
+# Не запускаем два парсера одновременно
+concurrency:
+  group: che168-catalog
+  cancel-in-progress: false
+
 
 jobs:
 
@@ -9,41 +27,56 @@ jobs:
 
     runs-on: ubuntu-latest
 
-    timeout-minutes: 10
+    timeout-minutes: 15
+
 
     steps:
 
       - name: Получить код
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
+        with:
+          ref: main
 
 
       - name: Установить Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v7
         with:
-          node-version: 20
-
-
-      - name: Создать npm проект
-        run: npm init -y
+          node-version: '24'
+          package-manager-cache: false
 
 
       - name: Установить Playwright
-        run: npm install playwright
+        run: npm install --no-save playwright
 
 
       - name: Установить Chromium
         run: npx playwright install chromium --with-deps
 
 
-      - name: Запустить CHE168
+      - name: Обновить автомобили CHE168
         run: node scrape.js
 
 
-      - name: Сохранить диагностику
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: che168-debug
-          path: |
-            car.json
-   
+      - name: Сохранить cars.json
+        run: |
+
+          git config user.name "github-actions[bot]"
+
+          git config user.email \
+          "41898282+github-actions[bot]@users.noreply.github.com"
+
+          git add cars.json
+
+
+          if git diff --cached --quiet; then
+
+            echo "Изменений в каталоге нет."
+
+          else
+
+            git commit \
+              -m "Update CHE168 catalog"
+
+            git push
+
+          fi
