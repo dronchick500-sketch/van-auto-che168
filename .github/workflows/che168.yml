@@ -1,0 +1,49 @@
+name: CHE168 test
+
+on:
+  workflow_dispatch:
+
+jobs:
+
+  scrape:
+
+    runs-on: ubuntu-latest
+
+    timeout-minutes: 10
+
+    steps:
+
+      - name: Получить код
+        uses: actions/checkout@v4
+
+
+      - name: Установить Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+
+      - name: Создать npm проект
+        run: npm init -y
+
+
+      - name: Установить Playwright
+        run: npm install playwright
+
+
+      - name: Установить Chromium
+        run: npx playwright install chromium --with-deps
+
+
+      - name: Запустить CHE168
+        run: node scrape.js
+
+
+      - name: Сохранить диагностику
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: che168-debug
+          path: |
+            che168.png
+            che168.html
