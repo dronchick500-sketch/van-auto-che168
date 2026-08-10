@@ -65,6 +65,7 @@ const fs = require('fs');
   const browser = await chromium.launch({
     headless: true
   });
+  const networkCandidates = [];
 
 
   let successfulResult = null;
@@ -99,6 +100,76 @@ const fs = require('fs');
 
 
     const page = await context.newPage();
+    page.on('response', async (response) => {
+
+  try {
+
+    const request = response.request();
+    const type = request.resourceType();
+
+    if (
+      type !== 'xhr' &&
+      type !== 'fetch'
+    ) {
+      return;
+    }
+
+    const contentType =
+      response.headers()['content-type'] || '';
+
+
+    const body =
+      await response.text();
+
+
+    if (
+      !body ||
+      body.length > 2000000
+    ) {
+      return;
+    }
+
+
+    /*
+      Нас интересуют ответы,
+      где потенциально может лежать
+      мощность двигателя.
+    */
+
+    if (
+      !/最大马力|马力|最大功率|horsepower|maxHorsepower|maxPower|power|kw/i
+        .test(body)
+    ) {
+      return;
+    }
+
+
+    networkCandidates.push({
+
+      url: response.url(),
+
+      status: response.status(),
+
+      type,
+
+      contentType,
+
+      body: body.slice(0, 200000)
+
+    });
+
+
+  } catch (error) {
+
+    /*
+      Некоторые ответы браузер
+      не даст прочитать.
+      Это нормально.
+    */
+
+  }
+
+});
 const networkCandidates = [];
 
 page.on('response', async (response) => {
