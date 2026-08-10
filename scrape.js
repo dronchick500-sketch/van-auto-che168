@@ -5,8 +5,397 @@ const fs = require('fs');
 
   const CAR_ID = '59231822';
 
-  const url =
+  const GLOBAL_URL =
+    `https://global.che168.com/en/detail/${CAR_ID}`;
+
+  const CHINA_URL =
     `https://pcm.che168.com/2023/cardetail_rn/index?infoid=${CAR_ID}&pvareaid=108991`;
+
+
+  const browser = await chromium.launch({
+    headless: true
+  });
+
+
+  function numberOrNull(value) {
+
+    if (value === null || value === undefined) {
+      return null;
+    }
+
+    const n = Number(value);
+
+    return Number.isFinite(n)
+      ? n
+      : null;
+  }
+
+
+  function firstMatch(text, regex) {
+
+    const match = text.match(regex);
+
+    return match
+      ? match[1].trim()
+      : null;
+  }
+
+
+  /*
+  ========================================
+  1. GLOBAL CHE168
+  ХАРАКТЕРИСТИКИ + МОЩНОСТЬ
+  ========================================
+  */
+
+  console.log(
+    '\n===== GLOBAL CHE168 =====\n'
+  );
+
+
+  const globalContext =
+    await browser.newContext({
+
+      locale: 'en-US',
+
+      userAgent:
+        'Mozilla/5.0 (Windows NT 10.0; Win64; x64) ' +
+        'AppleWebKit/537.36 (KHTML, like Gecko) ' +
+        'Chrome/126.0.0.0 Safari/537.36',
+
+      viewport: {
+        width: 1440,
+        height: 1200
+      }
+
+    });
+
+
+  const globalPage =
+    await globalContext.newPage();
+
+
+  await globalPage.goto(
+    GLOBAL_URL,
+    {
+      waitUntil: 'domcontentloaded',
+      timeout: 60000
+    }
+  );
+
+
+  await globalPage.waitForTimeout(
+    5000
+  );
+
+
+  const globalText =
+    await globalPage
+      .locator('body')
+      .innerText();
+
+
+  const globalHtml =
+    await globalPage.content();
+
+
+  console.log(
+    'Global text:',
+    globalText.length
+  );
+
+
+  /*
+  Название
+  */
+
+  let name =
+    firstMatch(
+      globalText,
+      /Home\s*\/.*?\n([^\n]+)\nPrice/
+    );
+
+
+  if (!name) {
+
+    name =
+      firstMatch(
+        globalText,
+        /#?\s*(Audi[^\n]+)/i
+      );
+
+  }
+
+
+  /*
+  Дата первой регистрации
+  */
+
+  const registrationDate =
+    firstMatch(
+      globalText,
+      /1st Reg\. Date\s+(\d{4}\.\d{2})/i
+    );
+
+
+  const year =
+    registrationDate
+      ? Number(
+          registrationDate.slice(0, 4)
+        )
+      : null;
+
+
+  /*
+  Пробег
+  */
+
+  const mileageRaw =
+    firstMatch(
+      globalText,
+      /Mileage \(km\)\s*([\d,]+)/i
+    );
+
+
+  const mileage =
+    mileageRaw
+      ? Number(
+          mileageRaw.replace(/,/g, '')
+        )
+      : null;
+
+
+  /*
+  Двигатель и мощность
+
+  Пример:
+  1.4T 150HP L4
+  */
+
+  const engineMatch =
+    globalText.match(
+      /Engine \(cc\)\s*([0-9.]+[TL]?)\s*(\d+)\s*HP/i
+    );
+
+
+  let engine = null;
+  let engineVolume = null;
+  let engineVolumeCc = null;
+  let power = null;
+
+
+  if (engineMatch) {
+
+    engine =
+      engineMatch[1];
+
+    power =
+      Number(engineMatch[2]);
+
+
+    const volumeMatch =
+      engine.match(
+        /([0-9.]+)/
+      );
+
+
+    if (volumeMatch) {
+
+      engineVolume =
+        Number(volumeMatch[1]);
+
+      engineVolumeCc =
+        Math.round(
+          engineVolume * 1000
+        );
+
+    }
+
+  }
+
+
+  /*
+  Топливо
+  */
+
+  const fuelEn =
+    firstMatch(
+      globalText,
+      /Fuel Type\s*([^\n]+)/i
+    );
+
+
+  const fuelMap = {
+
+    'Gasoline':
+      'Бензин',
+
+    'Diesel':
+      'Дизель',
+
+    'Electric':
+      'Электро',
+
+    'Hybrid':
+      'Гибрид',
+
+    'Plug-in Hybrid':
+      'Гибрид'
+
+  };
+
+
+  const fuel =
+    fuelMap[fuelEn]
+    || fuelEn;
+
+
+  /*
+  Коробка
+  */
+
+  const transmission =
+    firstMatch(
+      globalText,
+      /Trans\.\s*([^\n]+)/i
+    );
+
+
+  /*
+  Привод
+  */
+
+  const driveEn =
+    firstMatch(
+      globalText,
+      /Drive Train\s*([^\n]+)/i
+    );
+
+
+  const driveMap = {
+
+    'Front-Wheel Drive (FWD)':
+      'Передний',
+
+    'Rear-Wheel Drive (RWD)':
+      'Задний',
+
+    'All-Wheel Drive (AWD)':
+      'Полный',
+
+    'Four-Wheel Drive (4WD)':
+      'Полный'
+
+  };
+
+
+  const drive =
+    driveMap[driveEn]
+    || driveEn;
+
+
+  /*
+  Кузов
+  */
+
+  const bodyEn =
+    firstMatch(
+      globalText,
+      /Body Type\s*([^\n]+)/i
+    );
+
+
+  let body = bodyEn;
+
+
+  if (
+    bodyEn &&
+    /SUV|Crossover/i.test(bodyEn)
+  ) {
+
+    body =
+      'Кроссовер';
+
+  }
+
+
+  if (
+    bodyEn &&
+    /Sedan/i.test(bodyEn)
+  ) {
+
+    body =
+      'Седан';
+
+  }
+
+
+  if (
+    bodyEn &&
+    /MPV|Minivan/i.test(bodyEn)
+  ) {
+
+    body =
+      'Минивэн';
+
+  }
+
+
+  /*
+  Фотографии
+  */
+
+  const globalImages =
+    await globalPage
+      .locator('img')
+      .evaluateAll(
+        images =>
+          images.map(
+            img =>
+              img.currentSrc ||
+              img.src ||
+              img.dataset.src ||
+              ''
+          )
+      );
+
+
+  const photos = [
+
+    ...new Set(
+
+      globalImages
+        .filter(Boolean)
+        .filter(
+          src =>
+            src.includes(
+              'autoimg'
+            )
+        )
+
+    )
+
+  ];
+
+
+  await globalContext.close();
+
+
+  /*
+  ========================================
+  2. КИТАЙСКИЙ CHE168
+  ТОЛЬКО ЦЕНА В ЮАНЯХ
+  ========================================
+  */
+
+  console.log(
+    '\n===== ЦЕНА В ЮАНЯХ =====\n'
+  );
+
+
+  let priceWan = null;
+  let priceCny = null;
+  let chinaSuccess = false;
 
 
   const strategies = [
@@ -22,9 +411,8 @@ const fs = require('fs');
       viewport: {
         width: 1440,
         height: 1200
-      },
+      }
 
-      locale: 'zh-CN'
     },
 
 
@@ -39,335 +427,118 @@ const fs = require('fs');
       viewport: {
         width: 390,
         height: 844
-      },
+      }
 
-      locale: 'zh-CN'
-    },
-
-
-    {
-      name: 'crawler',
-
-      userAgent:
-        'Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)',
-
-      viewport: {
-        width: 1440,
-        height: 1200
-      },
-
-      locale: 'zh-CN'
     }
 
   ];
 
 
-  const browser = await chromium.launch({
-    headless: true
-  });
-  const networkCandidates = [];
-
-
-  let successfulResult = null;
-
-
-  for (const strategy of strategies) {
+  for (
+    const strategy
+    of strategies
+  ) {
 
     console.log(
-      `\n===== ПРОБУЕМ: ${strategy.name} =====\n`
+      `Пробуем цену: ${strategy.name}`
     );
 
 
-    const context = await browser.newContext({
+    const context =
+      await browser.newContext({
 
-      locale: strategy.locale,
+        locale: 'zh-CN',
 
-      userAgent: strategy.userAgent,
+        userAgent:
+          strategy.userAgent,
 
-      viewport: strategy.viewport,
+        viewport:
+          strategy.viewport,
 
-      timezoneId: 'Asia/Shanghai',
+        timezoneId:
+          'Asia/Shanghai'
 
-      extraHTTPHeaders: {
-        'Accept-Language':
-          'zh-CN,zh;q=0.9,en;q=0.7',
-
-        'Referer':
-          'https://www.che168.com/'
-      }
-
-    });
+      });
 
 
-    const page = await context.newPage();
-    page.on('response', async (response) => {
-
-  try {
-
-    const request = response.request();
-    const type = request.resourceType();
-
-    if (
-      type !== 'xhr' &&
-      type !== 'fetch'
-    ) {
-      return;
-    }
-
-    const contentType =
-      response.headers()['content-type'] || '';
-
-
-    const body =
-      await response.text();
-
-
-    if (
-      !body ||
-      body.length > 2000000
-    ) {
-      return;
-    }
-
-
-    /*
-      Нас интересуют ответы,
-      где потенциально может лежать
-      мощность двигателя.
-    */
-
-    if (
-      !/最大马力|马力|最大功率|horsepower|maxHorsepower|maxPower|power|kw/i
-        .test(body)
-    ) {
-      return;
-    }
-
-
-    networkCandidates.push({
-
-      url: response.url(),
-
-      status: response.status(),
-
-      type,
-
-      contentType,
-
-      body: body.slice(0, 200000)
-
-    });
-
-
-  } catch (error) {
-
-    /*
-      Некоторые ответы браузер
-      не даст прочитать.
-      Это нормально.
-    */
-
-  }
-
-});
-const networkCandidates = [];
-
-page.on('response', async (response) => {
-
-  try {
-
-    const request = response.request();
-    const type = request.resourceType();
-
-    const headers = response.headers();
-
-    const contentType =
-      headers['content-type'] || '';
-
-    if (
-      type !== 'xhr' &&
-      type !== 'fetch' &&
-      !contentType.includes('json')
-    ) {
-      return;
-    }
-
-    const body =
-      await response.text();
-
-    if (!body || body.length > 2000000) {
-      return;
-    }
-
-    const interesting =
-      /最大马力|马力|最大功率|horsepower|maxHorsepower|maxPower|power|kw/i
-        .test(body);
-
-    if (!interesting) {
-      return;
-    }
-
-    networkCandidates.push({
-
-      url: response.url(),
-
-      status: response.status(),
-
-      contentType,
-
-      body: body.slice(0, 200000)
-
-    });
-
-  } catch (error) {
-
-    // отдельный сетевой запрос
-    // не должен ломать весь парсер
-
-  }
-
-});
-
-    /*
-      Слегка приближаем браузер
-      к обычному пользовательскому.
-    */
-
-    await page.addInitScript(() => {
-
-      Object.defineProperty(
-        navigator,
-        'webdriver',
-        {
-          get: () => undefined
-        }
-      );
-
-    });
+    const page =
+      await context.newPage();
 
 
     try {
 
-      await page.goto(url, {
-        waitUntil: 'commit',
-        timeout: 45000
-      });
+      /*
+      Очень важно:
+      китайская цена теперь
+      НЕ МОЖЕТ сломать весь workflow.
+      */
+
+      await page.goto(
+        CHINA_URL,
+        {
+          waitUntil: 'commit',
+          timeout: 25000
+        }
+      );
 
 
-      await page.waitForTimeout(12000);
+      await page.waitForTimeout(
+        8000
+      );
 
 
-      const title =
-        await page.title();
-
-
-      const finalUrl =
-        page.url();
-
-
-      let text = '';
-
-      try {
-
-        text =
-          await page.locator('body').innerText({
+      const text =
+        await page
+          .locator('body')
+          .innerText({
             timeout: 10000
           });
 
-      } catch (error) {
-
-        text = '';
-
-      }
-
-
-      const html =
-        await page.content();
-
 
       console.log(
-        'TITLE:',
-        JSON.stringify(title)
-      );
-
-      console.log(
-        'FINAL URL:',
-        finalUrl
-      );
-
-      console.log(
-        'TEXT LENGTH:',
+        strategy.name,
+        'text:',
         text.length
       );
 
-      console.log(
-        '\n----- ТЕКСТ СТРАНИЦЫ -----\n'
-      );
-
-      console.log(
-        JSON.stringify(
-          text.slice(0, 1500)
-        )
-      );
-
 
       /*
-        Сохраняем диагностику
-        для КАЖДОЙ стратегии.
+      Главная цена расположена
+      непосредственно перед
+      "新车含税价"
       */
 
-      fs.writeFileSync(
-        `debug-${strategy.name}.html`,
-        html,
-        'utf8'
-      );
-
-
-      fs.writeFileSync(
-        `debug-${strategy.name}.txt`,
-        text,
-        'utf8'
-      );
-
-
-      await page.screenshot({
-        path:
-          `debug-${strategy.name}.png`,
-        fullPage: true
-      });
-
-
-      /*
-        Проверяем,
-        получили ли настоящую карточку.
-      */
-
-      const isRealCarPage =
-
-        text.length > 1000 &&
-
-        (
-          text.includes('上牌时间') ||
-          text.includes('表显里程') ||
-          text.includes('发动机排量')
+      const priceMatch =
+        text.match(
+          /(?:^|\n)\s*(\d+(?:\.\d+)?)\s*\n?\s*万\s*\n?\s*新车含税价/
         );
 
 
-      if (isRealCarPage) {
+      if (priceMatch) {
+
+        priceWan =
+          Number(
+            priceMatch[1]
+          );
+
+
+        priceCny =
+          Math.round(
+            priceWan * 10000
+          );
+
+
+        chinaSuccess = true;
+
 
         console.log(
-          `\nУСПЕХ: ${strategy.name}\n`
+          'Цена найдена:',
+          priceCny,
+          '¥'
         );
 
 
-        successfulResult = {
-          page,
-          context,
-          text,
-          html,
-          strategy: strategy.name
-        };
-
+        await context.close();
 
         break;
 
@@ -377,12 +548,7 @@ page.on('response', async (response) => {
     } catch (error) {
 
       console.log(
-        'Ошибка стратегии:',
-        strategy.name
-      );
-
-      console.log(
-        error.message
+        `${strategy.name}: ${error.message}`
       );
 
     }
@@ -394,389 +560,24 @@ page.on('response', async (response) => {
 
 
   /*
-    Если ни одна стратегия
-    не получила карточку —
-    НЕ роняем workflow.
-
-    Нам нужны сохранённые
-    txt/html/png для диагностики.
+  ========================================
+  ГОТОВЫЙ ОБЪЕКТ
+  ========================================
   */
-
-  if (!successfulResult) {
-
-    console.log(
-      '\n===== КАРТОЧКА НЕ ПОЛУЧЕНА =====\n'
-    );
-
-    console.log(
-      'Диагностика сохранена.'
-    );
-
-
-    await browser.close();
-
-    process.exit(0);
-
-  }
-
-
-  const {
-    page,
-    context,
-    text,
-    html,
-    strategy
-  } = successfulResult;
-
-
-  console.log(
-    '\n===== НАЧИНАЕМ ПАРСИНГ =====\n'
-  );
-
-
-  function firstMatch(regex, source = text) {
-
-    const match =
-      source.match(regex);
-
-    return match
-      ? match[1].trim()
-      : null;
-
-  }
-
-
-  function numberOrNull(value) {
-
-    if (
-      value === null ||
-      value === undefined
-    ) {
-
-      return null;
-
-    }
-
-
-    const n =
-      Number(value);
-
-
-    return Number.isFinite(n)
-      ? n
-      : null;
-
-  }
-
-
-  /* НАЗВАНИЕ */
-
-  let name =
-    firstMatch(
-      /好车\s+([^\n]+?)\s+投诉/
-    );
-
-
-  if (!name) {
-
-    name =
-      firstMatch(
-        /(奥迪[^\n]{2,80})/
-      );
-
-  }
-
-
-  /* ЦЕНА */
-
-  const priceWan =
-    numberOrNull(
-      firstMatch(
-        /(?:^|\n)\s*(\d+(?:\.\d+)?)\s*\n?\s*万\s*\n?\s*新车含税价/
-      )
-    );
-
-
-  const priceCny =
-    priceWan !== null
-      ? Math.round(
-          priceWan * 10000
-        )
-      : null;
-
-
-  /* РЕГИСТРАЦИЯ */
-
-  const registrationDate =
-    firstMatch(
-      /(\d{4}-\d{2})\s*\n?\s*上牌时间/
-    );
-
-
-  const year =
-    registrationDate
-      ? Number(
-          registrationDate.slice(0, 4)
-        )
-      : null;
-
-
-  /* ПРОБЕГ */
-
-  const mileageWan =
-    numberOrNull(
-      firstMatch(
-        /(\d+(?:\.\d+)?)\s*万公里\s*\n?\s*表显里程/
-      )
-    );
-
-
-  const mileage =
-    mileageWan !== null
-      ? Math.round(
-          mileageWan * 10000
-        )
-      : null;
-
-
-  /* ОБЪЁМ */
-
-  const engineVolume =
-    numberOrNull(
-      firstMatch(
-        /(\d+(?:\.\d+)?)L\s*\n?\s*发动机排量/
-      )
-    );
-
-
-  const engineVolumeCc =
-    engineVolume !== null
-      ? Math.round(
-          engineVolume * 1000
-        )
-      : null;
-
-
-  /* КОРОБКА */
-
-  const transmissionCn =
-    firstMatch(
-      /([^\n]+)\s*\n\s*变速箱/
-    );
-
-
-  const transmissionMap = {
-
-    '自动': 'Автомат',
-
-    '手动': 'Механика'
-
-  };
-
-
-  const transmission =
-
-    transmissionMap[
-      transmissionCn
-    ]
-
-    || transmissionCn;
-
-
-  /* ПРИВОД */
-
-  const driveCn =
-    firstMatch(
-      /([^\n]+)\s*\n\s*驱动方式/
-    );
-
-
-  const driveMap = {
-
-    '前置前驱':
-      'Передний',
-
-    '前置后驱':
-      'Задний',
-
-    '前置四驱':
-      'Полный',
-
-    '中置后驱':
-      'Задний',
-
-    '后置后驱':
-      'Задний'
-
-  };
-
-
-  const drive =
-
-    driveMap[
-      driveCn
-    ]
-
-    || driveCn;
-
-
-  /* ТОПЛИВО */
-
-  const fuelCn =
-    firstMatch(
-      /([^\n]+)\s*\n\s*燃料形式/
-    );
-
-
-  const fuelMap = {
-
-    '汽油':
-      'Бензин',
-
-    '柴油':
-      'Дизель',
-
-    '纯电动':
-      'Электро',
-
-    '插电式混合动力':
-      'Гибрид',
-
-    '油电混合':
-      'Гибрид'
-
-  };
-
-
-  const fuel =
-
-    fuelMap[
-      fuelCn
-    ]
-
-    || fuelCn;
-
-
-  /* МОЩНОСТЬ */
-
-  const powerCandidates = [];
-
-
-  const powerPatterns = [
-
-    /最大马力[^0-9]{0,30}(\d{2,4})/g,
-
-    /(\d{2,4})\s*马力/g,
-
-    /"horsepower"\s*:\s*"?(\d{2,4})/g,
-
-    /"maxHorsepower"\s*:\s*"?(\d{2,4})/g
-
-  ];
-
-
-  for (
-    const regex
-    of powerPatterns
-  ) {
-
-    let match;
-
-
-    while (
-      (
-        match =
-          regex.exec(html)
-      ) !== null
-    ) {
-
-      const value =
-        Number(match[1]);
-
-
-      if (
-        value >= 50 &&
-        value <= 1500 &&
-        !powerCandidates.includes(
-          value
-        )
-      ) {
-
-        powerCandidates.push(
-          value
-        );
-
-      }
-
-    }
-
-  }
-
-
-  let power = null;
-
-
-  if (
-    powerCandidates.length === 1
-  ) {
-
-    power =
-      powerCandidates[0];
-
-  }
-
-
-  /* ФОТО */
-
-  const rawImages =
-    await page
-      .locator('img')
-      .evaluateAll(
-        images =>
-          images.map(
-            img =>
-              img.currentSrc ||
-              img.src ||
-              img.dataset.src ||
-              img.dataset.original ||
-              ''
-          )
-      );
-
-
-  const photos = [
-
-    ...new Set(
-
-      rawImages
-        .filter(Boolean)
-        .filter(
-          src =>
-            src.includes(
-              'autoimg'
-            )
-            ||
-            src.includes(
-              'che168'
-            )
-        )
-
-    )
-
-  ];
-
 
   const car = {
 
-    id: CAR_ID,
+    id:
+      CAR_ID,
 
     source:
       'CHE168',
 
-    strategy,
+    globalUrl:
+      GLOBAL_URL,
 
-    sourceUrl:
-      url,
+    chinaUrl:
+      CHINA_URL,
 
     name,
 
@@ -784,19 +585,22 @@ page.on('response', async (response) => {
 
     priceCny,
 
+    chinaPriceLoaded:
+      chinaSuccess,
+
     registrationDate,
 
     year,
 
     mileage,
 
+    engine,
+
     engineVolume,
 
     engineVolumeCc,
 
     power,
-
-    powerCandidates,
 
     preferentialPower:
 
@@ -810,6 +614,8 @@ page.on('response', async (response) => {
 
     fuel,
 
+    body,
+
     photosCount:
       photos.length,
 
@@ -818,44 +624,8 @@ page.on('response', async (response) => {
 
   };
 
-fs.writeFileSync(
-  'network-candidates.json',
-  JSON.stringify(
-    networkCandidates,
-    null,
-    2
-  ),
-  'utf8'
-);
 
-console.log(
-  '\n===== СЕТЕВЫЕ КАНДИДАТЫ =====\n'
-);
-
-console.log(
-  'Найдено ответов:',
-  networkCandidates.length
-);
-
-networkCandidates
-  .slice(0, 20)
-  .forEach(function(item, index) {
-
-    console.log(
-      `\n--- ${index + 1} ---`
-    );
-
-    console.log(
-      item.url
-    );
-
-    console.log(
-      item.body.slice(0, 1500)
-    );
-
-  });
   fs.writeFileSync(
-
     'car.json',
 
     JSON.stringify(
@@ -865,7 +635,6 @@ networkCandidates
     ),
 
     'utf8'
-
   );
 
 
@@ -875,17 +644,13 @@ networkCandidates
 
 
   console.log(
-
     JSON.stringify(
       car,
       null,
       2
     )
-
   );
 
-
-  await context.close();
 
   await browser.close();
 
