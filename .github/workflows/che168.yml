@@ -46,5 +46,8 @@ jobs:
           name: che168-debug
           path: |
             car.json
-            che168.png
-            che168.html
+            debut-*.txt
+            debut-*.html
+            debut-*.png
+
+            
