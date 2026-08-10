@@ -1,10 +1,11 @@
 {
-  "updatedAt": "2026-08-10T20:59:04.735Z",
+  "updatedAt": "2026-08-10T21:12:21.081Z",
   "cbr": {
     "cnyRub": 12.2546,
     "eurRub": 95.286
   },
   "vtbCnySell": null,
   "vtbSource": "unavailable",
-  "vtbObservedAt": null
+  "vtbObservedAt": null,
+  "vtbDebug": null
 }
