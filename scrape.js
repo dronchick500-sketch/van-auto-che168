@@ -99,7 +99,63 @@ const fs = require('fs');
 
 
     const page = await context.newPage();
+const networkCandidates = [];
 
+page.on('response', async (response) => {
+
+  try {
+
+    const request = response.request();
+    const type = request.resourceType();
+
+    const headers = response.headers();
+
+    const contentType =
+      headers['content-type'] || '';
+
+    if (
+      type !== 'xhr' &&
+      type !== 'fetch' &&
+      !contentType.includes('json')
+    ) {
+      return;
+    }
+
+    const body =
+      await response.text();
+
+    if (!body || body.length > 2000000) {
+      return;
+    }
+
+    const interesting =
+      /最大马力|马力|最大功率|horsepower|maxHorsepower|maxPower|power|kw/i
+        .test(body);
+
+    if (!interesting) {
+      return;
+    }
+
+    networkCandidates.push({
+
+      url: response.url(),
+
+      status: response.status(),
+
+      contentType,
+
+      body: body.slice(0, 200000)
+
+    });
+
+  } catch (error) {
+
+    // отдельный сетевой запрос
+    // не должен ломать весь парсер
+
+  }
+
+});
 
     /*
       Слегка приближаем браузер
@@ -691,7 +747,42 @@ const fs = require('fs');
 
   };
 
+fs.writeFileSync(
+  'network-candidates.json',
+  JSON.stringify(
+    networkCandidates,
+    null,
+    2
+  ),
+  'utf8'
+);
 
+console.log(
+  '\n===== СЕТЕВЫЕ КАНДИДАТЫ =====\n'
+);
+
+console.log(
+  'Найдено ответов:',
+  networkCandidates.length
+);
+
+networkCandidates
+  .slice(0, 20)
+  .forEach(function(item, index) {
+
+    console.log(
+      `\n--- ${index + 1} ---`
+    );
+
+    console.log(
+      item.url
+    );
+
+    console.log(
+      item.body.slice(0, 1500)
+    );
+
+  });
   fs.writeFileSync(
 
     'car.json',
