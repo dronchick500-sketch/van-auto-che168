@@ -45,6 +45,7 @@ jobs:
         with:
           name: che168-debug
           path: |
+            network-candidates.json
             car.json
             debut-*.txt
             debut-*.html
