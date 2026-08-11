@@ -6,6 +6,11 @@ const RATES_FILE = 'rates.json';
 const CBR_URL =
   'https://www.cbr.ru/scripts/XML_daily.asp';
 
+
+// ==================================================
+// VAN AUTO — НАСТРОЙКИ
+// ==================================================
+
 const MIN_CAR_YEAR = 2020;
 
 const BANK_COMMISSION = 0.02;
@@ -21,8 +26,12 @@ const CHINA_HIGH_CNY = 13000;
 const RUSSIA_LOW_RUB = 223000;
 const RUSSIA_HIGH_RUB = 273000;
 
+
+// Базовая ставка утильсбора M1
 const UTIL_BASE_RUB = 20000;
 
+
+// Курс ВТБ берём из GitHub Variable
 const VTB_CNY_RATE =
   Number(
     String(
@@ -31,23 +40,27 @@ const VTB_CNY_RATE =
   );
 
 
-/*
-==================================================
-JSON
-==================================================
-*/
+// ==================================================
+// JSON
+// ==================================================
 
 function loadJson(path, fallback) {
+
   try {
+
     if (!fs.existsSync(path)) {
       return fallback;
     }
 
     return JSON.parse(
-      fs.readFileSync(path, 'utf8')
+      fs.readFileSync(
+        path,
+        'utf8'
+      )
     );
 
   } catch (error) {
+
     console.log(
       `Ошибка чтения ${path}:`,
       error.message
@@ -59,15 +72,21 @@ function loadJson(path, fallback) {
 
 
 function saveJson(path, data) {
+
   fs.writeFileSync(
     path,
-    JSON.stringify(data, null, 2) + '\n',
+    JSON.stringify(
+      data,
+      null,
+      2
+    ) + '\n',
     'utf8'
   );
 }
 
 
 function toNumber(value) {
+
   if (
     value === null ||
     value === undefined ||
@@ -94,13 +113,12 @@ function roundRub(value) {
 }
 
 
-/*
-==================================================
-ЦБ РФ
-==================================================
-*/
+// ==================================================
+// ЦБ РФ
+// ==================================================
 
 function parseCbrRate(xml, code) {
+
   const blocks =
     xml.match(
       /<Valute[\s\S]*?<\/Valute>/g
@@ -130,17 +148,27 @@ function parseCbrRate(xml, code) {
         /<Value>([\d.,]+)<\/Value>/i
       );
 
-    if (!nominalMatch || !valueMatch) {
+    if (
+      !nominalMatch ||
+      !valueMatch
+    ) {
       return null;
     }
 
     const nominal =
-      toNumber(nominalMatch[1]);
+      toNumber(
+        nominalMatch[1]
+      );
 
     const value =
-      toNumber(valueMatch[1]);
+      toNumber(
+        valueMatch[1]
+      );
 
-    if (!nominal || !value) {
+    if (
+      !nominal ||
+      !value
+    ) {
       return null;
     }
 
@@ -152,7 +180,10 @@ function parseCbrRate(xml, code) {
 
 
 async function getCbrRates() {
-  console.log('\n===== КУРСЫ ЦБ РФ =====');
+
+  console.log(
+    '\n===== КУРСЫ ЦБ РФ ====='
+  );
 
   const response =
     await fetch(
@@ -166,6 +197,7 @@ async function getCbrRates() {
     );
 
   if (!response.ok) {
+
     throw new Error(
       `ЦБ РФ HTTP ${response.status}`
     );
@@ -175,12 +207,22 @@ async function getCbrRates() {
     await response.text();
 
   const cnyRub =
-    parseCbrRate(xml, 'CNY');
+    parseCbrRate(
+      xml,
+      'CNY'
+    );
 
   const eurRub =
-    parseCbrRate(xml, 'EUR');
+    parseCbrRate(
+      xml,
+      'EUR'
+    );
 
-  if (!cnyRub || !eurRub) {
+  if (
+    !cnyRub ||
+    !eurRub
+  ) {
+
     throw new Error(
       'Не удалось получить курсы ЦБ'
     );
@@ -203,13 +245,12 @@ async function getCbrRates() {
 }
 
 
-/*
-==================================================
-ВОЗРАСТ
-==================================================
-*/
+// ==================================================
+// ВОЗРАСТ
+// ==================================================
 
 function parseYearMonth(value) {
+
   if (!value) {
     return null;
   }
@@ -224,13 +265,25 @@ function parseYearMonth(value) {
   }
 
   return {
-    year: Number(match[1]),
-    month: Number(match[2])
+    year:
+      Number(match[1]),
+
+    month:
+      Number(match[2])
   };
 }
 
 
 function getAgeInfo(car) {
+
+  /*
+  Для расчёта сначала ищем дату производства.
+
+  Если CHE168 её не дал —
+  используем первую регистрацию
+  только для ПРЕДВАРИТЕЛЬНОГО расчёта.
+  */
+
   const production =
     parseYearMonth(
       car.productionDate ||
@@ -248,10 +301,11 @@ function getAgeInfo(car) {
     registration;
 
   if (!selected) {
+
     return {
       ok: false,
       reason:
-        'Нет даты выпуска/регистрации'
+        'Нет даты производства/регистрации'
     };
   }
 
@@ -268,62 +322,109 @@ function getAgeInfo(car) {
       selected.month
     );
 
-  let group;
+  /*
+  Для утиля нам важно:
+  до 3 лет или старше 3 лет.
+  */
+
+  const utilAgeGroup =
+    ageMonths <= 36
+      ? 'under3'
+      : 'over3';
+
+  /*
+  Для таможенной пошлины:
+  до 3 / 3-5 / старше 5.
+  */
+
+  let customsAgeGroup;
 
   if (ageMonths <= 36) {
-    group = 'under3';
-  } else if (ageMonths <= 60) {
-    group = '3to5';
+
+    customsAgeGroup =
+      'under3';
+
+  } else if (
+    ageMonths <= 60
+  ) {
+
+    customsAgeGroup =
+      '3to5';
+
   } else {
-    group = 'over5';
+
+    customsAgeGroup =
+      'over5';
   }
 
   return {
+
     ok: true,
-    group,
+
     ageMonths,
+
+    utilAgeGroup,
+
+    customsAgeGroup,
+
     source:
       production
         ? 'productionDate'
-        : 'registrationDate'
+        : 'registrationDate',
+
+    estimated:
+      !production
   };
 }
 
 
-/*
-==================================================
-ПОШЛИНА
-==================================================
-*/
+// ==================================================
+// ТАМОЖЕННАЯ ПОШЛИНА
+// ==================================================
 
 function dutyForUnder3(
   valueEur,
   engineCc
 ) {
+
   let percent;
   let minPerCc;
 
   if (valueEur <= 8500) {
+
     percent = 0.54;
     minPerCc = 2.5;
 
-  } else if (valueEur <= 16700) {
+  } else if (
+    valueEur <= 16700
+  ) {
+
     percent = 0.48;
     minPerCc = 3.5;
 
-  } else if (valueEur <= 42300) {
+  } else if (
+    valueEur <= 42300
+  ) {
+
     percent = 0.48;
     minPerCc = 5.5;
 
-  } else if (valueEur <= 84500) {
+  } else if (
+    valueEur <= 84500
+  ) {
+
     percent = 0.48;
     minPerCc = 7.5;
 
-  } else if (valueEur <= 169000) {
+  } else if (
+    valueEur <= 169000
+  ) {
+
     percent = 0.48;
     minPerCc = 15;
 
   } else {
+
     percent = 0.48;
     minPerCc = 20;
   }
@@ -336,6 +437,7 @@ function dutyForUnder3(
 
 
 function rate3to5(cc) {
+
   if (cc <= 1000) return 1.5;
   if (cc <= 1500) return 1.7;
   if (cc <= 1800) return 2.5;
@@ -347,6 +449,7 @@ function rate3to5(cc) {
 
 
 function rateOver5(cc) {
+
   if (cc <= 1000) return 3.0;
   if (cc <= 1500) return 3.2;
   if (cc <= 1800) return 3.5;
@@ -357,40 +460,53 @@ function rateOver5(cc) {
 }
 
 
-/*
-==================================================
-ТАМОЖЕННЫЙ СБОР
-==================================================
-*/
+// ==================================================
+// ТАМОЖЕННЫЙ СБОР
+// ==================================================
 
 function customsOperationFee(
   customsValueRub
 ) {
-  if (customsValueRub <= 200000) {
+
+  if (
+    customsValueRub <= 200000
+  ) {
     return 1231;
   }
 
-  if (customsValueRub <= 450000) {
+  if (
+    customsValueRub <= 450000
+  ) {
     return 2462;
   }
 
-  if (customsValueRub <= 1200000) {
+  if (
+    customsValueRub <= 1200000
+  ) {
     return 4924;
   }
 
-  if (customsValueRub <= 2700000) {
+  if (
+    customsValueRub <= 2700000
+  ) {
     return 13541;
   }
 
-  if (customsValueRub <= 4200000) {
+  if (
+    customsValueRub <= 4200000
+  ) {
     return 18465;
   }
 
-  if (customsValueRub <= 5500000) {
+  if (
+    customsValueRub <= 5500000
+  ) {
     return 21344;
   }
 
-  if (customsValueRub <= 7000000) {
+  if (
+    customsValueRub <= 7000000
+  ) {
     return 49240;
   }
 
@@ -398,25 +514,256 @@ function customsOperationFee(
 }
 
 
-/*
-==================================================
-ЛЬГОТНЫЙ УТИЛЬ
-==================================================
-*/
+// ==================================================
+// МОЩНОСТЬ
+// ==================================================
 
-function calculatePreferentialUtil(
+function hpToKw(hp) {
+
+  /*
+  1 метрическая л.с. =
+  0.73549875 кВт
+  */
+
+  return hp * 0.73549875;
+}
+
+
+function getPowerBandIndex(
+  powerKw
+) {
+
+  const limits = [
+    51.48,
+    73.55,
+    95.61,
+    117.68,
+    139.75,
+    161.81,
+    183.88,
+    205.94,
+    228.00,
+    250.07,
+    272.13,
+    294.20,
+    316.26,
+    338.33,
+    367.75,
+    Infinity
+  ];
+
+  return limits.findIndex(
+    limit =>
+      powerKw <= limit
+  );
+}
+
+
+// ==================================================
+// УТИЛЬСБОР 2026
+//
+// Физическое лицо,
+// ввоз для личного пользования.
+//
+// Значения:
+// [новый, старше 3 лет]
+//
+// Таблица Постановления №1291,
+// редакция с №1713.
+// ==================================================
+
+
+// --------------------------------------------------
+// ДО 1000 см3
+// --------------------------------------------------
+
+const UTIL_2026_TO_1000 = [
+
+  [0.17, 0.26],
+  [0.17, 0.26],
+  [0.17, 0.26],
+  [0.17, 0.26],
+
+  [15.36, 28.44],
+  [15.84, 29.28],
+  [16.20, 30.12],
+
+  [17.28, 30.12],
+  [17.28, 30.12],
+  [17.28, 30.12],
+  [17.28, 30.12],
+  [17.28, 30.12],
+  [17.28, 30.12],
+  [17.28, 30.12],
+  [17.28, 30.12],
+  [17.28, 30.12]
+
+];
+
+
+// --------------------------------------------------
+// 1001–2000 см3
+// --------------------------------------------------
+
+const UTIL_2026_1000_2000 = [
+
+  [0.17, 0.26],
+  [0.17, 0.26],
+  [0.17, 0.26],
+  [0.17, 0.26],
+
+  [45.00, 74.64],
+  [47.64, 79.20],
+  [50.52, 83.88],
+  [57.12, 91.92],
+  [64.56, 100.56],
+  [72.96, 110.16],
+  [83.16, 120.60],
+  [94.80, 132.00],
+  [108.00, 144.60],
+  [123.24, 158.40],
+  [140.40, 173.40],
+  [160.08, 189.84]
+
+];
+
+
+// --------------------------------------------------
+// 2001–3000 см3
+// --------------------------------------------------
+
+const UTIL_2026_2000_3000 = [
+
+  [0.17, 0.26],
+  [0.17, 0.26],
+  [0.17, 0.26],
+  [0.17, 0.26],
+
+  [115.34, 172.80],
+  [118.20, 175.08],
+  [120.12, 177.60],
+  [126.00, 183.00],
+  [131.04, 188.52],
+  [136.32, 193.68],
+  [141.72, 199.08],
+  [147.48, 204.72],
+  [153.36, 210.48],
+  [159.48, 216.36],
+  [165.84, 222.36],
+  [172.44, 228.60]
+
+];
+
+
+// --------------------------------------------------
+// 3001–3500 см3
+// --------------------------------------------------
+
+const UTIL_2026_3000_3500 = [
+
+  [129.20, 197.81],
+  [129.20, 197.81],
+  [129.20, 197.81],
+  [129.20, 197.81],
+
+  [131.76, 200.04],
+  [134.40, 202.20],
+  [137.16, 204.36],
+  [140.52, 207.24],
+  [144.00, 212.40],
+  [151.92, 217.80],
+  [160.32, 224.28],
+  [169.20, 231.00],
+  [178.44, 237.96],
+  [188.28, 245.04],
+  [198.60, 252.48],
+  [209.52, 260.04]
+
+];
+
+
+// --------------------------------------------------
+// СВЫШЕ 3500 см3
+// --------------------------------------------------
+
+const UTIL_2026_OVER_3500 = [
+
+  [164.53, 216.29],
+  [164.53, 216.29],
+  [164.53, 216.29],
+  [164.53, 216.29],
+
+  [167.28, 219.48],
+  [170.16, 222.84],
+  [173.04, 226.20],
+  [176.52, 231.36],
+  [180.00, 236.64],
+  [186.36, 249.60],
+  [192.88, 263.40],
+  [199.68, 277.92],
+  [206.64, 293.16],
+  [213.84, 309.36],
+  [221.28, 326.40],
+  [229.08, 344.28]
+
+];
+
+
+// ==================================================
+// ВЫБОР ТАБЛИЦЫ УТИЛЯ
+// ==================================================
+
+function getUtilTable(engineCc) {
+
+  if (
+    engineCc <= 1000
+  ) {
+    return UTIL_2026_TO_1000;
+  }
+
+  if (
+    engineCc <= 2000
+  ) {
+    return UTIL_2026_1000_2000;
+  }
+
+  if (
+    engineCc <= 3000
+  ) {
+    return UTIL_2026_2000_3000;
+  }
+
+  if (
+    engineCc <= 3500
+  ) {
+    return UTIL_2026_3000_3500;
+  }
+
+  return UTIL_2026_OVER_3500;
+}
+
+
+// ==================================================
+// РАСЧЁТ УТИЛЯ
+// ==================================================
+
+function calculateUtil(
   car,
   age
 ) {
-  const power =
-    toNumber(car.power);
+
+  const powerHp =
+    toNumber(
+      car.power
+    );
 
   const engineCc =
     toNumber(
       car.engineVolumeCc
     );
 
-  if (!power) {
+  if (!powerHp) {
+
     return {
       ok: false,
       status:
@@ -427,6 +774,7 @@ function calculatePreferentialUtil(
   }
 
   if (!engineCc) {
+
     return {
       ok: false,
       status:
@@ -436,72 +784,139 @@ function calculatePreferentialUtil(
     };
   }
 
+
   const fuel =
     String(
       car.fuel || ''
     ).toLowerCase();
 
+
+  /*
+  Пока сознательно не публикуем
+  EV и гибриды.
+  */
+
   if (
     fuel.includes('электро') ||
-    fuel.includes('гибрид')
+    fuel.includes('гибрид') ||
+    fuel.includes('electric') ||
+    fuel.includes('hybrid')
   ) {
+
     return {
       ok: false,
       status:
         'special_powertrain',
       reason:
-        'Электро/гибрид требует отдельного расчёта'
+        'EV/гибрид пока не публикуется'
     };
   }
 
-  /*
-  Льготный расчёт оставляем
-  только для ДВС до 3 л
-  и до 160 л.с. включительно.
-  */
+
+  const powerKw =
+    hpToKw(
+      powerHp
+    );
+
+
+  const bandIndex =
+    getPowerBandIndex(
+      powerKw
+    );
+
 
   if (
-    engineCc <= 3000 &&
-    power <= 160
+    bandIndex < 0
   ) {
-    const coeff =
-      age.group === 'under3'
-        ? 0.17
-        : 0.26;
 
     return {
-      ok: true,
-      type:
-        'preferential',
-      coeff,
-      feeRub:
-        roundRub(
-          UTIL_BASE_RUB *
-          coeff
-        )
+      ok: false,
+      status:
+        'util_error',
+      reason:
+        'Не определён диапазон мощности'
     };
   }
 
+
+  const table =
+    getUtilTable(
+      engineCc
+    );
+
+
+  const row =
+    table[
+      bandIndex
+    ];
+
+
+  if (!row) {
+
+    return {
+      ok: false,
+      status:
+        'util_error',
+      reason:
+        'Нет коэффициента утильсбора'
+    };
+  }
+
+
+  const coeff =
+
+    age.utilAgeGroup ===
+    'under3'
+
+      ? row[0]
+
+      : row[1];
+
+
+  const feeRub =
+    roundRub(
+      UTIL_BASE_RUB *
+      coeff
+    );
+
+
   return {
-    ok: false,
-    status:
-      'needs_util_table',
-    reason:
-      'Для мощности выше 160 л.с. нужен коэффициент утильсбора 2026'
+
+    ok: true,
+
+    type:
+      (
+        engineCc <= 3000 &&
+        powerHp <= 160
+      )
+        ? 'preferential'
+        : 'progressive_2026',
+
+    coeff,
+
+    feeRub,
+
+    powerHp,
+
+    powerKw:
+      Number(
+        powerKw.toFixed(2)
+      ),
+
+    bandIndex
   };
 }
 
 
-/*
-==================================================
-ТАМОЖНЯ
-==================================================
-*/
+// ==================================================
+// ТАМОЖНЯ
+// ==================================================
 
 function calculateCustoms(
   car,
   rates
 ) {
+
   const priceCny =
     toNumber(
       car.priceCny
@@ -513,6 +928,7 @@ function calculateCustoms(
     );
 
   if (!priceCny) {
+
     return {
       ok: false,
       status:
@@ -523,6 +939,7 @@ function calculateCustoms(
   }
 
   if (!engineCc) {
+
     return {
       ok: false,
       status:
@@ -532,10 +949,15 @@ function calculateCustoms(
     };
   }
 
+
   const age =
-    getAgeInfo(car);
+    getAgeInfo(
+      car
+    );
+
 
   if (!age.ok) {
+
     return {
       ok: false,
       status:
@@ -545,19 +967,27 @@ function calculateCustoms(
     };
   }
 
+
   const customsValueRub =
+
     priceCny *
     rates.cbr.cnyRub;
 
+
   const customsValueEur =
+
     customsValueRub /
     rates.cbr.eurRub;
 
+
   let dutyEur;
 
+
   if (
-    age.group === 'under3'
+    age.customsAgeGroup ===
+    'under3'
   ) {
+
     dutyEur =
       dutyForUnder3(
         customsValueEur,
@@ -565,17 +995,25 @@ function calculateCustoms(
       );
 
   } else if (
-    age.group === '3to5'
+    age.customsAgeGroup ===
+    '3to5'
   ) {
+
     dutyEur =
       engineCc *
-      rate3to5(engineCc);
+      rate3to5(
+        engineCc
+      );
 
   } else {
+
     dutyEur =
       engineCc *
-      rateOver5(engineCc);
+      rateOver5(
+        engineCc
+      );
   }
+
 
   const dutyRub =
     roundRub(
@@ -583,12 +1021,15 @@ function calculateCustoms(
       rates.cbr.eurRub
     );
 
+
   const operationFeeRub =
     customsOperationFee(
       customsValueRub
     );
 
+
   return {
+
     ok: true,
 
     age,
@@ -598,7 +1039,11 @@ function calculateCustoms(
         customsValueRub
       ),
 
-    customsValueEur,
+    customsValueEur:
+      Number(
+        customsValueEur
+          .toFixed(2)
+      ),
 
     dutyRub,
 
@@ -607,75 +1052,120 @@ function calculateCustoms(
 }
 
 
-/*
-==================================================
-ГЛАВНЫЙ РАСЧЁТ
-==================================================
-*/
+// ==================================================
+// СКРЫТАЯ КАРТОЧКА
+// ==================================================
+
+function hiddenCar(
+  car,
+  reason,
+  error
+) {
+
+  return {
+
+    ...car,
+
+    finalPriceRub:
+      null,
+
+    publishToCatalog:
+      false,
+
+    priceEstimate:
+      true,
+
+    priceIsPreliminary:
+      true,
+
+    pricingStatus:
+      'hidden',
+
+    pricingReason:
+      reason,
+
+    pricingError:
+      error
+  };
+}
+
+
+// ==================================================
+// ГЛАВНЫЙ РАСЧЁТ
+// ==================================================
 
 function calculateCar(
   car,
   rates
 ) {
-  const year =
-    Number(car.year);
 
   /*
-  Жёстко убираем всё до 2020.
+  Год каталога определяем
+  ТОЛЬКО по первой регистрации.
   */
 
+  const registration =
+    parseYearMonth(
+      car.registrationDate
+    );
+
+
   if (
-    !Number.isFinite(year) ||
-    year < MIN_CAR_YEAR
+    !registration ||
+    registration.year <
+    MIN_CAR_YEAR
   ) {
+
     return null;
   }
+
 
   const priceCny =
     toNumber(
       car.priceCny
     );
 
+
   if (!priceCny) {
-    return {
-      ...car,
 
-      finalPriceRub:
-        null,
-
-      pricingStatus:
-        'waiting_data',
-
-      pricingReason:
-        'missing_price',
-
-      pricingError:
-        'Нет цены CHE168',
-
-      priceIsPreliminary:
-        true
-    };
+    return hiddenCar(
+      car,
+      'missing_price',
+      'Нет цены CHE168'
+    );
   }
 
-  if (!rates.vtbCnySell) {
-    return {
-      ...car,
 
-      finalPriceRub:
-        null,
+  if (
+    !rates.vtbCnySell
+  ) {
 
-      pricingStatus:
-        'waiting_data',
+    return hiddenCar(
+      car,
+      'missing_vtb',
+      'Нет курса ВТБ'
+    );
+  }
 
-      pricingReason:
-        'missing_vtb',
 
-      pricingError:
-        'Нет курса ВТБ',
+  const fuel =
+    String(
+      car.fuel || ''
+    ).toLowerCase();
 
-      priceIsPreliminary:
-        true
-    };
+
+  if (
+    fuel.includes('электро') ||
+    fuel.includes('гибрид') ||
+    fuel.includes('electric') ||
+    fuel.includes('hybrid')
+  ) {
+
+    return hiddenCar(
+      car,
+      'special_powertrain',
+      'EV/гибрид пока не рассчитывается'
+    );
   }
 
 
@@ -685,119 +1175,139 @@ function calculateCar(
       rates
     );
 
+
   if (!customs.ok) {
-    return {
-      ...car,
 
-      finalPriceRub:
-        null,
-
-      pricingStatus:
-        'waiting_data',
-
-      pricingReason:
-        customs.status,
-
-      pricingError:
-        customs.reason,
-
-      priceIsPreliminary:
-        true
-    };
+    return hiddenCar(
+      car,
+      customs.status,
+      customs.reason
+    );
   }
 
 
   const util =
-    calculatePreferentialUtil(
+    calculateUtil(
       car,
       customs.age
     );
 
+
   if (!util.ok) {
-    return {
-      ...car,
 
-      finalPriceRub:
-        null,
-
-      pricingStatus:
-        util.status ===
-        'needs_util_table'
-          ? 'needs_util_table'
-          : 'manual_calculation',
-
-      pricingReason:
-        util.status,
-
-      pricingError:
-        util.reason,
-
-      customsDutyRub:
-        customs.dutyRub,
-
-      customsOperationFeeRub:
-        customs.operationFeeRub,
-
-      priceIsPreliminary:
-        true
-    };
+    return hiddenCar(
+      car,
+      util.status,
+      util.reason
+    );
   }
 
 
+  // ----------------------------------------------
+  // РАСХОДЫ КИТАЙ
+  // ----------------------------------------------
+
   const chinaExpensesCny =
+
     priceCny <=
     LOW_PRICE_LIMIT_CNY
+
       ? CHINA_LOW_CNY
+
       : CHINA_HIGH_CNY;
 
 
+  // ----------------------------------------------
+  // РАСХОДЫ РФ
+  // ----------------------------------------------
+
   const russiaExpensesRub =
+
     priceCny <=
     LOW_PRICE_LIMIT_CNY
+
       ? RUSSIA_LOW_RUB
+
       : RUSSIA_HIGH_RUB;
 
 
+  // ----------------------------------------------
+  // ОПЛАТА КИТАЙ
+  // ----------------------------------------------
+
   const cnyPaymentBase =
+
     priceCny +
     chinaExpensesCny;
 
 
   const paymentRubBeforeBank =
+
     cnyPaymentBase *
     rates.vtbCnySell;
 
 
   const bankCommissionRub =
+
     paymentRubBeforeBank *
     BANK_COMMISSION;
 
 
   const cnyPaymentRub =
+
     paymentRubBeforeBank +
     bankCommissionRub;
 
 
+  // ----------------------------------------------
+  // ТАМОЖНЯ
+  // ----------------------------------------------
+
   const customsTotalRub =
+
     customs.dutyRub +
+
     customs.operationFeeRub +
+
     util.feeRub;
 
 
+  // ----------------------------------------------
+  // ФИНАЛ
+  // ----------------------------------------------
+
   const finalPriceRub =
     roundRub(
+
       cnyPaymentRub +
+
       customsTotalRub +
+
       russiaExpensesRub +
+
       FIXED_RUB +
+
       DELIVERY_SPB_RUB
+
     );
 
 
   return {
+
     ...car,
 
+
+    // ============================================
+    // ПУБЛИКАЦИЯ
+    // ============================================
+
+    publishToCatalog:
+      true,
+
     finalPriceRub,
+
+    priceEstimate:
+      true,
 
     priceIsPreliminary:
       true,
@@ -815,6 +1325,25 @@ function calculateCar(
       new Date()
         .toISOString(),
 
+
+    // ============================================
+    // ВОЗРАСТ
+    // ============================================
+
+    calculationAgeSource:
+      customs.age.source,
+
+    calculationAgeEstimated:
+      customs.age.estimated,
+
+    calculationAgeMonths:
+      customs.age.ageMonths,
+
+
+    // ============================================
+    // КУРСЫ
+    // ============================================
+
     vtbCnyRate:
       rates.vtbCnySell,
 
@@ -824,9 +1353,19 @@ function calculateCar(
     cbrEurRate:
       rates.cbr.eurRub,
 
+
+    // ============================================
+    // КИТАЙ
+    // ============================================
+
     chinaExpensesCny,
 
     cnyPaymentBase,
+
+    paymentRubBeforeBank:
+      roundRub(
+        paymentRubBeforeBank
+      ),
 
     bankCommissionRub:
       roundRub(
@@ -838,14 +1377,27 @@ function calculateCar(
         cnyPaymentRub
       ),
 
+
+    // ============================================
+    // ТАМОЖНЯ
+    // ============================================
+
     customsValueRub:
       customs.customsValueRub,
+
+    customsValueEur:
+      customs.customsValueEur,
 
     customsDutyRub:
       customs.dutyRub,
 
     customsOperationFeeRub:
       customs.operationFeeRub,
+
+
+    // ============================================
+    // УТИЛЬ
+    // ============================================
 
     utilFeeRub:
       util.feeRub,
@@ -855,6 +1407,14 @@ function calculateCar(
 
     utilType:
       util.type,
+
+    powerKw:
+      util.powerKw,
+
+
+    // ============================================
+    // ОСТАЛЬНЫЕ РАСХОДЫ
+    // ============================================
 
     customsTotalRub,
 
@@ -866,7 +1426,13 @@ function calculateCar(
     deliverySpbRub:
       DELIVERY_SPB_RUB,
 
+
+    // ============================================
+    // РАСШИФРОВКА
+    // ============================================
+
     pricingBreakdown: {
+
       vehiclePriceCny:
         priceCny,
 
@@ -904,6 +1470,9 @@ function calculateCar(
       customsOperationFeeRub:
         customs.operationFeeRub,
 
+      utilCoeff:
+        util.coeff,
+
       utilFeeRub:
         util.feeRub,
 
@@ -923,11 +1492,9 @@ function calculateCar(
 }
 
 
-/*
-==================================================
-ЗАПУСК
-==================================================
-*/
+// ==================================================
+// ЗАПУСК
+// ==================================================
 
 (async () => {
 
@@ -936,7 +1503,7 @@ function calculateCar(
   );
 
   console.log(
-    'VAN AUTO — PRICING DIAGNOSTIC'
+    'VAN AUTO — PRICING 2026 FINAL'
   );
 
   console.log(
@@ -950,6 +1517,7 @@ function calculateCar(
     ) ||
     VTB_CNY_RATE <= 0
   ) {
+
     throw new Error(
       'Не задан VTB_CNY_RATE'
     );
@@ -974,6 +1542,7 @@ function calculateCar(
       sourceCars
     )
   ) {
+
     throw new Error(
       'cars.json должен содержать массив'
     );
@@ -981,27 +1550,36 @@ function calculateCar(
 
 
   console.log(
-    'До фильтра по году:',
+    'Машин до фильтра:',
     sourceCars.length
   );
 
 
+  /*
+  Отбор каталога строго
+  по первой регистрации.
+  */
+
   const cars =
     sourceCars.filter(
       function (car) {
-        const year =
-          Number(car.year);
+
+        const registration =
+          parseYearMonth(
+            car.registrationDate
+          );
 
         return (
-          Number.isFinite(year) &&
-          year >= MIN_CAR_YEAR
+          registration &&
+          registration.year >=
+          MIN_CAR_YEAR
         );
       }
     );
 
 
   console.log(
-    'После фильтра 2020+:',
+    'Первая регистрация 2020+:',
     cars.length
   );
 
@@ -1011,6 +1589,7 @@ function calculateCar(
 
 
   const rates = {
+
     updatedAt:
       new Date()
         .toISOString(),
@@ -1035,7 +1614,7 @@ function calculateCar(
   );
 
 
-  const calculatedCars =
+  const result =
     cars
       .map(
         car =>
@@ -1049,39 +1628,69 @@ function calculateCar(
 
   saveJson(
     CARS_FILE,
-    calculatedCars
+    result
   );
 
 
-  const calculated =
-    calculatedCars.filter(
+  // ==================================================
+  // СТАТИСТИКА
+  // ==================================================
+
+  const published =
+    result.filter(
       car =>
-        car.pricingStatus ===
-        'calculated'
+        car.publishToCatalog ===
+        true
     );
 
 
-  const needsUtil =
-    calculatedCars.filter(
+  const hidden =
+    result.filter(
       car =>
-        car.pricingStatus ===
-        'needs_util_table'
+        car.publishToCatalog !==
+        true
     );
 
 
-  const manual =
-    calculatedCars.filter(
+  const preferential =
+    published.filter(
       car =>
-        car.pricingStatus ===
-        'manual_calculation'
+        car.utilType ===
+        'preferential'
     );
 
 
-  const waiting =
-    calculatedCars.filter(
+  const progressive =
+    published.filter(
       car =>
-        car.pricingStatus ===
-        'waiting_data'
+        car.utilType ===
+        'progressive_2026'
+    );
+
+
+  const missingPrice =
+    hidden.filter(
+      car =>
+        car.pricingReason ===
+        'missing_price'
+    );
+
+
+  const specialPowertrain =
+    hidden.filter(
+      car =>
+        car.pricingReason ===
+        'special_powertrain'
+    );
+
+
+  const otherHidden =
+    hidden.filter(
+      car =>
+        car.pricingReason !==
+          'missing_price' &&
+        car.pricingReason !==
+          'special_powertrain'
     );
 
 
@@ -1090,106 +1699,107 @@ function calculateCar(
   );
 
   console.log(
-    'РАСЧЁТ VAN AUTO ГОТОВ'
+    'VAN AUTO — PRICING ГОТОВО'
   );
 
   console.log(
     '================================'
   );
 
+
   console.log(
-    'Всего 2020+:',
-    calculatedCars.length
+    'Всего автомобилей:',
+    result.length
   );
 
   console.log(
-    'Рассчитано:',
-    calculated.length
+    'Опубликовано в каталог:',
+    published.length
   );
 
   console.log(
-    'Нужна таблица утиля 160+:',
-    needsUtil.length
+    'Льготный утиль:',
+    preferential.length
   );
 
   console.log(
-    'Ручной расчёт:',
-    manual.length
+    'Повышенный утиль 2026:',
+    progressive.length
   );
 
   console.log(
-    'Не хватает данных:',
-    waiting.length
+    'Скрыто без цены:',
+    missingPrice.length
+  );
+
+  console.log(
+    'Скрыто EV/Hybrid:',
+    specialPowertrain.length
+  );
+
+  console.log(
+    'Скрыто прочее:',
+    otherHidden.length
   );
 
 
   console.log(
-    '\n===== РАССЧИТАНО =====\n'
+    '\n===== ОПУБЛИКОВАННЫЕ МАШИНЫ =====\n'
   );
 
-  calculated
-    .slice(0, 30)
+
+  published
+    .slice(
+      0,
+      50
+    )
     .forEach(
       function (car) {
+
         console.log(
+
           `${car.name} | ` +
-          `${car.year} | ` +
-          `${car.engineVolumeCc || '?'} см3 | ` +
-          `${car.power || '?'} л.с. | ` +
+
+          `${car.registrationDate} | ` +
+
+          `${car.engineVolumeCc} см3 | ` +
+
+          `${car.power} л.с. | ` +
+
+          `${car.powerKw} кВт | ` +
+
+          `коэфф. ${car.utilCoeff} | ` +
+
           `утиль ${car.utilFeeRub} ₽ | ` +
+
           `итог ${car.finalPriceRub} ₽`
+
         );
       }
     );
 
 
   console.log(
-    '\n===== 160+ — НУЖНА ТАБЛИЦА УТИЛЯ =====\n'
+    '\n===== СКРЫТО =====\n'
   );
 
-  needsUtil
-    .slice(0, 50)
+
+  hidden
+    .slice(
+      0,
+      50
+    )
     .forEach(
       function (car) {
+
         console.log(
+
           `${car.name} | ` +
-          `${car.year} | ` +
-          `${car.engineVolumeCc || '?'} см3 | ` +
-          `${car.power || '?'} л.с.`
-        );
-      }
-    );
 
-
-  console.log(
-    '\n===== НЕ ХВАТАЕТ ДАННЫХ =====\n'
-  );
-
-  waiting
-    .slice(0, 50)
-    .forEach(
-      function (car) {
-        console.log(
-          `${car.name} | ` +
           `${car.pricingReason} | ` +
+
           `${car.pricingError}`
-        );
-      }
-    );
 
-
-  console.log(
-    '\n===== РУЧНОЙ РАСЧЁТ =====\n'
-  );
-
-  manual
-    .slice(0, 50)
-    .forEach(
-      function (car) {
-        console.log(
-          `${car.name} | ` +
-          `${car.pricingReason} | ` +
-          `${car.pricingError}`
         );
       }
     );
