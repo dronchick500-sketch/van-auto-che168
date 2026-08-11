@@ -48,7 +48,7 @@
     "finalPriceRub": 3503022,
     "pricingStatus": "calculated",
     "pricingError": null,
-    "pricingUpdatedAt": "2026-08-11T07:41:04.940Z",
+    "pricingUpdatedAt": "2026-08-11T08:00:45.326Z",
     "vtbCnyRate": 12.5,
     "vtbRateSource": "GitHub variable VTB_CNY_RATE",
     "cbrCnyRate": 12.2546,
@@ -83,8 +83,6 @@
       "customsDutyRub": 226781,
       "customsOperationFeeRub": 13541,
       "utilFeeRub": 5200,
-      "utilCoeff": 0.26,
-      "utilType": "preferential",
       "customsTotalRub": 245522,
       "russiaExpensesRub": 273000,
       "fixedRub": 250000,
@@ -93,7 +91,8 @@
     },
     "priceIsPreliminary": true,
     "customsValueRub": 2267101,
-    "utilType": "preferential"
+    "utilType": "preferential",
+    "pricingReason": null
   },
   {
     "id": "59303306",
@@ -146,9 +145,10 @@
     "lastSeenAt": "2026-08-10T19:56:32.533Z",
     "status": "active",
     "finalPriceRub": null,
-    "pricingStatus": "manual_calculation",
+    "pricingStatus": "waiting_data",
     "pricingError": "Нет объёма двигателя",
-    "priceIsPreliminary": true
+    "priceIsPreliminary": true,
+    "pricingReason": "missing_engine"
   },
   {
     "id": "59236888",
@@ -200,9 +200,9 @@
     "addedAt": "2026-08-10T19:57:05.447Z",
     "lastSeenAt": "2026-08-10T19:57:05.447Z",
     "status": "active",
-    "finalPriceRub": 4433535,
-    "pricingStatus": "calculated",
-    "pricingError": null,
+    "finalPriceRub": null,
+    "pricingStatus": "needs_util_table",
+    "pricingError": "Для мощности выше 160 л.с. нужен коэффициент утильсбора 2026",
     "customsDutyRub": 514544,
     "priceIsPreliminary": true,
     "pricingUpdatedAt": "2026-08-11T07:41:04.941Z",
@@ -246,7 +246,8 @@
       "fixedRub": 250000,
       "deliverySpbRub": 210000,
       "finalPriceRub": 4433535
-    }
+    },
+    "pricingReason": "needs_util_table"
   },
   {
     "id": "59252871",
@@ -295,9 +296,10 @@
     "lastSeenAt": "2026-08-10T19:57:51.607Z",
     "status": "active",
     "finalPriceRub": null,
-    "pricingStatus": "manual_calculation",
+    "pricingStatus": "waiting_data",
     "pricingError": "Нет объёма двигателя",
-    "priceIsPreliminary": true
+    "priceIsPreliminary": true,
+    "pricingReason": "missing_engine"
   },
   {
     "id": "59099540",
@@ -350,9 +352,10 @@
     "lastSeenAt": "2026-08-10T19:58:38.170Z",
     "status": "active",
     "finalPriceRub": null,
-    "pricingStatus": "manual_calculation",
+    "pricingStatus": "waiting_data",
     "pricingError": "Нет объёма двигателя",
-    "priceIsPreliminary": true
+    "priceIsPreliminary": true,
+    "pricingReason": "missing_engine"
   },
   {
     "id": "59284996",
@@ -404,9 +407,9 @@
     "addedAt": "2026-08-10T19:59:38.718Z",
     "lastSeenAt": "2026-08-10T19:59:38.718Z",
     "status": "active",
-    "finalPriceRub": 3263176,
-    "pricingStatus": "calculated",
-    "pricingError": null,
+    "finalPriceRub": null,
+    "pricingStatus": "needs_util_table",
+    "pricingError": "Для мощности выше 160 л.с. нужен коэффициент утильсбора 2026",
     "customsDutyRub": 533602,
     "priceIsPreliminary": true,
     "pricingUpdatedAt": "2026-08-11T07:41:04.941Z",
@@ -450,7 +453,8 @@
       "fixedRub": 250000,
       "deliverySpbRub": 210000,
       "finalPriceRub": 3263176
-    }
+    },
+    "pricingReason": "needs_util_table"
   },
   {
     "id": "59187649",
@@ -502,9 +506,9 @@
     "addedAt": "2026-08-10T20:39:47.364Z",
     "lastSeenAt": "2026-08-10T20:39:47.364Z",
     "status": "active",
-    "finalPriceRub": 3721926,
-    "pricingStatus": "calculated",
-    "pricingError": null,
+    "finalPriceRub": null,
+    "pricingStatus": "needs_util_table",
+    "pricingError": "Для мощности выше 160 л.с. нужен коэффициент утильсбора 2026",
     "customsDutyRub": 667002,
     "priceIsPreliminary": true,
     "pricingUpdatedAt": "2026-08-11T07:41:04.941Z",
@@ -548,7 +552,8 @@
       "fixedRub": 250000,
       "deliverySpbRub": 210000,
       "finalPriceRub": 3721926
-    }
+    },
+    "pricingReason": "needs_util_table"
   },
   {
     "id": "59243600",
@@ -601,9 +606,10 @@
     "lastSeenAt": "2026-08-10T20:41:12.625Z",
     "status": "active",
     "finalPriceRub": null,
-    "pricingStatus": "manual_calculation",
+    "pricingStatus": "waiting_data",
     "pricingError": "Нет объёма двигателя",
-    "priceIsPreliminary": true
+    "priceIsPreliminary": true,
+    "pricingReason": "missing_engine"
   },
   {
     "id": "59284876",
@@ -655,9 +661,9 @@
     "addedAt": "2026-08-10T20:56:00.893Z",
     "lastSeenAt": "2026-08-10T20:56:00.893Z",
     "status": "active",
-    "finalPriceRub": 3457122,
-    "pricingStatus": "calculated",
-    "pricingError": null,
+    "finalPriceRub": null,
+    "pricingStatus": "needs_util_table",
+    "pricingError": "Для мощности выше 160 л.с. нужен коэффициент утильсбора 2026",
     "customsDutyRub": 457373,
     "priceIsPreliminary": true,
     "pricingUpdatedAt": "2026-08-11T07:41:04.941Z",
@@ -701,7 +707,8 @@
       "fixedRub": 250000,
       "deliverySpbRub": 210000,
       "finalPriceRub": 3457122
-    }
+    },
+    "pricingReason": "needs_util_table"
   },
   {
     "id": "58966653",
@@ -754,9 +761,10 @@
     "lastSeenAt": "2026-08-10T20:56:34.504Z",
     "status": "active",
     "finalPriceRub": null,
-    "pricingStatus": "manual_calculation",
+    "pricingStatus": "waiting_data",
     "pricingError": "Нет объёма двигателя",
-    "priceIsPreliminary": true
+    "priceIsPreliminary": true,
+    "pricingReason": "missing_engine"
   },
   {
     "id": "59093833",
@@ -808,9 +816,9 @@
     "addedAt": "2026-08-10T20:57:19.741Z",
     "lastSeenAt": "2026-08-10T20:57:19.741Z",
     "status": "active",
-    "finalPriceRub": 4357035,
-    "pricingStatus": "calculated",
-    "pricingError": null,
+    "finalPriceRub": null,
+    "pricingStatus": "needs_util_table",
+    "pricingError": "Для мощности выше 160 л.с. нужен коэффициент утильсбора 2026",
     "priceIsPreliminary": true,
     "pricingUpdatedAt": "2026-08-11T07:41:04.941Z",
     "vtbCnyRate": 12.5,
@@ -854,7 +862,8 @@
       "fixedRub": 250000,
       "deliverySpbRub": 210000,
       "finalPriceRub": 4357035
-    }
+    },
+    "pricingReason": "needs_util_table"
   },
   {
     "id": "59156662",
@@ -906,9 +915,9 @@
     "addedAt": "2026-08-10T21:10:11.372Z",
     "lastSeenAt": "2026-08-10T21:10:11.372Z",
     "status": "active",
-    "finalPriceRub": 3230389,
-    "pricingStatus": "calculated",
-    "pricingError": null,
+    "finalPriceRub": null,
+    "pricingStatus": "needs_util_table",
+    "pricingError": "Для мощности выше 160 л.с. нужен коэффициент утильсбора 2026",
     "customsDutyRub": 396390,
     "priceIsPreliminary": true,
     "pricingUpdatedAt": "2026-08-11T07:41:04.941Z",
@@ -952,7 +961,8 @@
       "fixedRub": 250000,
       "deliverySpbRub": 210000,
       "finalPriceRub": 3230389
-    }
+    },
+    "pricingReason": "needs_util_table"
   },
   {
     "id": "59130160",
@@ -1005,9 +1015,10 @@
     "lastSeenAt": "2026-08-10T21:10:39.008Z",
     "status": "active",
     "finalPriceRub": null,
-    "pricingStatus": "manual_calculation",
+    "pricingStatus": "waiting_data",
     "pricingError": "Нет объёма двигателя",
-    "priceIsPreliminary": true
+    "priceIsPreliminary": true,
+    "pricingReason": "missing_engine"
   },
   {
     "id": "59274464",
@@ -1059,9 +1070,9 @@
     "addedAt": "2026-08-10T21:11:26.858Z",
     "lastSeenAt": "2026-08-10T21:11:26.858Z",
     "status": "active",
-    "finalPriceRub": 4739535,
-    "pricingStatus": "calculated",
-    "pricingError": null,
+    "finalPriceRub": null,
+    "pricingStatus": "needs_util_table",
+    "pricingError": "Для мощности выше 160 л.с. нужен коэффициент утильсбора 2026",
     "customsDutyRub": 514544,
     "priceIsPreliminary": true,
     "pricingUpdatedAt": "2026-08-11T07:41:04.941Z",
@@ -1105,7 +1116,8 @@
       "fixedRub": 250000,
       "deliverySpbRub": 210000,
       "finalPriceRub": 4739535
-    }
+    },
+    "pricingReason": "needs_util_table"
   },
   {
     "id": "59275245",
@@ -1159,9 +1171,11 @@
     "status": "active",
     "finalPriceRub": null,
     "pricingStatus": "manual_calculation",
-    "pricingError": "Электро/гибрид требует отдельного расчёта утильсбора",
+    "pricingError": "Электро/гибрид требует отдельного расчёта",
     "customsDutyRub": 714645,
-    "priceIsPreliminary": true
+    "priceIsPreliminary": true,
+    "pricingReason": "special_powertrain",
+    "customsOperationFeeRub": 13541
   },
   {
     "id": "59287774",
@@ -1213,9 +1227,9 @@
     "addedAt": "2026-08-11T04:53:18.937Z",
     "lastSeenAt": "2026-08-11T04:53:18.937Z",
     "status": "active",
-    "finalPriceRub": 6766009,
-    "pricingStatus": "calculated",
-    "pricingError": null,
+    "finalPriceRub": null,
+    "pricingStatus": "needs_util_table",
+    "pricingError": "Для мощности выше 160 л.с. нужен коэффициент утильсбора 2026",
     "customsDutyRub": 514544,
     "priceIsPreliminary": true,
     "pricingUpdatedAt": "2026-08-11T07:41:04.941Z",
@@ -1259,7 +1273,8 @@
       "fixedRub": 250000,
       "deliverySpbRub": 210000,
       "finalPriceRub": 6766009
-    }
+    },
+    "pricingReason": "needs_util_table"
   },
   {
     "id": "59289655",
@@ -1305,9 +1320,10 @@
     "lastSeenAt": "2026-08-11T04:53:51.982Z",
     "status": "active",
     "finalPriceRub": null,
-    "pricingStatus": "waiting_price",
+    "pricingStatus": "waiting_data",
     "pricingError": "Нет цены CHE168",
-    "priceIsPreliminary": true
+    "priceIsPreliminary": true,
+    "pricingReason": "missing_price"
   },
   {
     "id": "59228570",
@@ -1360,9 +1376,10 @@
     "lastSeenAt": "2026-08-11T04:54:37.834Z",
     "status": "active",
     "finalPriceRub": null,
-    "pricingStatus": "manual_calculation",
+    "pricingStatus": "waiting_data",
     "pricingError": "Нет объёма двигателя",
-    "priceIsPreliminary": true
+    "priceIsPreliminary": true,
+    "pricingReason": "missing_engine"
   },
   {
     "id": "59306670",
@@ -1407,9 +1424,10 @@
     "lastSeenAt": "2026-08-11T04:55:56.937Z",
     "status": "active",
     "finalPriceRub": null,
-    "pricingStatus": "waiting_price",
+    "pricingStatus": "waiting_data",
     "pricingError": "Нет цены CHE168",
-    "priceIsPreliminary": true
+    "priceIsPreliminary": true,
+    "pricingReason": "missing_price"
   },
   {
     "id": "59306647",
@@ -1463,9 +1481,11 @@
     "status": "active",
     "finalPriceRub": null,
     "pricingStatus": "manual_calculation",
-    "pricingError": "Электро/гибрид требует отдельного расчёта утильсбора",
+    "pricingError": "Электро/гибрид требует отдельного расчёта",
     "customsDutyRub": 457373,
-    "priceIsPreliminary": true
+    "priceIsPreliminary": true,
+    "pricingReason": "special_powertrain",
+    "customsOperationFeeRub": 13541
   },
   {
     "id": "58979716",
@@ -1515,9 +1535,10 @@
     "lastSeenAt": "2026-08-11T07:14:33.509Z",
     "status": "active",
     "finalPriceRub": null,
-    "pricingStatus": "manual_calculation",
+    "pricingStatus": "waiting_data",
     "pricingError": "Нет объёма двигателя",
-    "priceIsPreliminary": true
+    "priceIsPreliminary": true,
+    "pricingReason": "missing_engine"
   },
   {
     "id": "59308750",
@@ -1565,9 +1586,10 @@
     "lastSeenAt": "2026-08-11T07:14:55.260Z",
     "status": "active",
     "finalPriceRub": null,
-    "pricingStatus": "waiting_price",
+    "pricingStatus": "waiting_data",
     "pricingError": "Нет цены CHE168",
-    "priceIsPreliminary": true
+    "priceIsPreliminary": true,
+    "pricingReason": "missing_price"
   },
   {
     "id": "59308394",
@@ -1613,9 +1635,10 @@
     "lastSeenAt": "2026-08-11T07:15:27.583Z",
     "status": "active",
     "finalPriceRub": null,
-    "pricingStatus": "waiting_price",
+    "pricingStatus": "waiting_data",
     "pricingError": "Нет цены CHE168",
-    "priceIsPreliminary": true
+    "priceIsPreliminary": true,
+    "pricingReason": "missing_price"
   },
   {
     "id": "59308384",
@@ -1660,9 +1683,10 @@
     "lastSeenAt": "2026-08-11T07:15:48.815Z",
     "status": "active",
     "finalPriceRub": null,
-    "pricingStatus": "waiting_price",
+    "pricingStatus": "waiting_data",
     "pricingError": "Нет цены CHE168",
-    "priceIsPreliminary": true
+    "priceIsPreliminary": true,
+    "pricingReason": "missing_price"
   },
   {
     "id": "59308628",
@@ -1707,9 +1731,10 @@
     "lastSeenAt": "2026-08-11T07:16:08.354Z",
     "status": "active",
     "finalPriceRub": null,
-    "pricingStatus": "waiting_price",
+    "pricingStatus": "waiting_data",
     "pricingError": "Нет цены CHE168",
-    "priceIsPreliminary": true
+    "priceIsPreliminary": true,
+    "pricingReason": "missing_price"
   },
   {
     "id": "59267592",
@@ -1757,9 +1782,10 @@
     "lastSeenAt": "2026-08-11T07:16:34.446Z",
     "status": "active",
     "finalPriceRub": null,
-    "pricingStatus": "waiting_price",
+    "pricingStatus": "waiting_data",
     "pricingError": "Нет цены CHE168",
-    "priceIsPreliminary": true
+    "priceIsPreliminary": true,
+    "pricingReason": "missing_price"
   },
   {
     "id": "59162627",
@@ -1807,9 +1833,10 @@
     "lastSeenAt": "2026-08-11T07:17:02.515Z",
     "status": "active",
     "finalPriceRub": null,
-    "pricingStatus": "waiting_price",
+    "pricingStatus": "waiting_data",
     "pricingError": "Нет цены CHE168",
-    "priceIsPreliminary": true
+    "priceIsPreliminary": true,
+    "pricingReason": "missing_price"
   },
   {
     "id": "59308322",
@@ -1855,9 +1882,10 @@
     "lastSeenAt": "2026-08-11T07:17:29.413Z",
     "status": "active",
     "finalPriceRub": null,
-    "pricingStatus": "waiting_price",
+    "pricingStatus": "waiting_data",
     "pricingError": "Нет цены CHE168",
-    "priceIsPreliminary": true
+    "priceIsPreliminary": true,
+    "pricingReason": "missing_price"
   },
   {
     "id": "59308256",
@@ -1903,9 +1931,10 @@
     "lastSeenAt": "2026-08-11T07:18:04.613Z",
     "status": "active",
     "finalPriceRub": null,
-    "pricingStatus": "waiting_price",
+    "pricingStatus": "waiting_data",
     "pricingError": "Нет цены CHE168",
-    "priceIsPreliminary": true
+    "priceIsPreliminary": true,
+    "pricingReason": "missing_price"
   },
   {
     "id": "59308255",
@@ -1951,9 +1980,10 @@
     "lastSeenAt": "2026-08-11T07:18:25.053Z",
     "status": "active",
     "finalPriceRub": null,
-    "pricingStatus": "waiting_price",
+    "pricingStatus": "waiting_data",
     "pricingError": "Нет цены CHE168",
-    "priceIsPreliminary": true
+    "priceIsPreliminary": true,
+    "pricingReason": "missing_price"
   },
   {
     "id": "59308237",
@@ -1999,9 +2029,10 @@
     "lastSeenAt": "2026-08-11T07:18:46.711Z",
     "status": "active",
     "finalPriceRub": null,
-    "pricingStatus": "waiting_price",
+    "pricingStatus": "waiting_data",
     "pricingError": "Нет цены CHE168",
-    "priceIsPreliminary": true
+    "priceIsPreliminary": true,
+    "pricingReason": "missing_price"
   },
   {
     "id": "59297053",
@@ -2046,9 +2077,10 @@
     "lastSeenAt": "2026-08-11T07:19:07.530Z",
     "status": "active",
     "finalPriceRub": null,
-    "pricingStatus": "waiting_price",
+    "pricingStatus": "waiting_data",
     "pricingError": "Нет цены CHE168",
-    "priceIsPreliminary": true
+    "priceIsPreliminary": true,
+    "pricingReason": "missing_price"
   },
   {
     "id": "59308214",
@@ -2093,9 +2125,10 @@
     "lastSeenAt": "2026-08-11T07:19:29.951Z",
     "status": "active",
     "finalPriceRub": null,
-    "pricingStatus": "waiting_price",
+    "pricingStatus": "waiting_data",
     "pricingError": "Нет цены CHE168",
-    "priceIsPreliminary": true
+    "priceIsPreliminary": true,
+    "pricingReason": "missing_price"
   },
   {
     "id": "59239051",
@@ -2140,9 +2173,10 @@
     "lastSeenAt": "2026-08-11T07:19:57.902Z",
     "status": "active",
     "finalPriceRub": null,
-    "pricingStatus": "waiting_price",
+    "pricingStatus": "waiting_data",
     "pricingError": "Нет цены CHE168",
-    "priceIsPreliminary": true
+    "priceIsPreliminary": true,
+    "pricingReason": "missing_price"
   },
   {
     "id": "59308042",
@@ -2187,9 +2221,10 @@
     "lastSeenAt": "2026-08-11T07:20:25.288Z",
     "status": "active",
     "finalPriceRub": null,
-    "pricingStatus": "waiting_price",
+    "pricingStatus": "waiting_data",
     "pricingError": "Нет цены CHE168",
-    "priceIsPreliminary": true
+    "priceIsPreliminary": true,
+    "pricingReason": "missing_price"
   },
   {
     "id": "59137696",
@@ -2235,9 +2270,10 @@
     "lastSeenAt": "2026-08-11T07:37:03.691Z",
     "status": "active",
     "finalPriceRub": null,
-    "pricingStatus": "waiting_price",
+    "pricingStatus": "waiting_data",
     "pricingError": "Нет цены CHE168",
-    "priceIsPreliminary": true
+    "priceIsPreliminary": true,
+    "pricingReason": "missing_price"
   },
   {
     "id": "59289663",
@@ -2283,9 +2319,10 @@
     "lastSeenAt": "2026-08-11T07:37:25.426Z",
     "status": "active",
     "finalPriceRub": null,
-    "pricingStatus": "waiting_price",
+    "pricingStatus": "waiting_data",
     "pricingError": "Нет цены CHE168",
-    "priceIsPreliminary": true
+    "priceIsPreliminary": true,
+    "pricingReason": "missing_price"
   },
   {
     "id": "59309050",
@@ -2331,9 +2368,10 @@
     "lastSeenAt": "2026-08-11T07:38:11.919Z",
     "status": "active",
     "finalPriceRub": null,
-    "pricingStatus": "waiting_price",
+    "pricingStatus": "waiting_data",
     "pricingError": "Нет цены CHE168",
-    "priceIsPreliminary": true
+    "priceIsPreliminary": true,
+    "pricingReason": "missing_price"
   },
   {
     "id": "59168093",
@@ -2375,10 +2413,10 @@
     "addedAt": "2026-08-11T07:39:22.666Z",
     "lastSeenAt": "2026-08-11T07:39:22.666Z",
     "status": "active",
-    "finalPriceRub": 3869198,
+    "finalPriceRub": null,
     "priceIsPreliminary": true,
-    "pricingStatus": "calculated",
-    "pricingError": null,
+    "pricingStatus": "needs_util_table",
+    "pricingError": "Для мощности выше 160 л.с. нужен коэффициент утильсбора 2026",
     "pricingUpdatedAt": "2026-08-11T07:41:04.941Z",
     "vtbCnyRate": 12.5,
     "cbrCnyRate": 12.2546,
@@ -2421,7 +2459,8 @@
       "fixedRub": 250000,
       "deliverySpbRub": 210000,
       "finalPriceRub": 3869198
-    }
+    },
+    "pricingReason": "needs_util_table"
   },
   {
     "id": "59168292",
@@ -2465,10 +2504,10 @@
     "addedAt": "2026-08-11T07:39:38.311Z",
     "lastSeenAt": "2026-08-11T07:39:38.311Z",
     "status": "active",
-    "finalPriceRub": 7227411,
+    "finalPriceRub": null,
     "priceIsPreliminary": true,
-    "pricingStatus": "calculated",
-    "pricingError": null,
+    "pricingStatus": "needs_util_table",
+    "pricingError": "Для мощности выше 160 л.с. нужен коэффициент утильсбора 2026",
     "pricingUpdatedAt": "2026-08-11T07:41:04.941Z",
     "vtbCnyRate": 12.5,
     "cbrCnyRate": 12.2546,
@@ -2511,6 +2550,452 @@
       "fixedRub": 250000,
       "deliverySpbRub": 210000,
       "finalPriceRub": 7227411
-    }
+    },
+    "pricingReason": "needs_util_table"
+  },
+  {
+    "id": "58751278",
+    "country": "Китай",
+    "source": "CHE168",
+    "globalUrl": "https://global.che168.com/en/detail/58751278",
+    "name": "Mercedes-Benz GLS 2023 Second Facelift GLS 450 4MATIC Luxury",
+    "registrationDate": "2024.01",
+    "year": 2024,
+    "mileage": 27000,
+    "engine": "3.0T",
+    "engineVolume": 3,
+    "engineVolumeCc": 3000,
+    "power": 367,
+    "preferentialPower": false,
+    "transmission": "Автомат",
+    "drive": "Полный",
+    "fuel": "Гибрид",
+    "body": "Кроссовер",
+    "photo": "https://erscglobal2.autoimg.cn/escimg/auto/g34/M0A/0B/8A/1400x0_c42_autohomecar__ChxpV2oueIWAFijvAAFCDom95_k013.jpg.webp",
+    "photosCount": 20,
+    "photos": [
+      "https://erscglobal2.autoimg.cn/escimg/auto/g34/M0A/0B/8A/1400x0_c42_autohomecar__ChxpV2oueIWAFijvAAFCDom95_k013.jpg.webp",
+      "https://erscglobal2.autoimg.cn/escimg/auto/g33/M08/E2/ED/1400x0_c42_autohomecar__ChxpVWpZoDeAD24jAAHIi6Qa9CE883.jpg.webp",
+      "https://erscglobal2.autoimg.cn/escimg/auto/g34/M01/09/0E/1400x0_c42_autohomecar__ChtpWGoueIaAEAYlAAGNTYY77lM421.jpg.webp",
+      "https://erscglobal2.autoimg.cn/escimg/auto/g34/M0B/0B/8A/1400x0_c42_autohomecar__ChxpV2oueIaAA_jcAAGtsRLH_e8669.jpg.webp",
+      "https://erscglobal2.autoimg.cn/escimg/auto/g34/M0B/0B/92/1400x0_c42_autohomecar__ChxpWGoueIaAWCYlAAEqanV0r9g474.jpg.webp",
+      "https://erscglobal2.autoimg.cn/escimg/auto/g34/M03/09/0E/1400x0_c42_autohomecar__ChtpWGoueIaARCLzAAGgsktueoU109.jpg.webp",
+      "https://erscglobal2.autoimg.cn/escimg/auto/g34/M0B/0B/92/1400x0_c42_autohomecar__ChxpWGoueIiAQZ7GAAGMLD_S30g175.jpg.webp",
+      "https://erscglobal2.autoimg.cn/escimg/auto/g34/M00/0B/92/1400x0_c42_autohomecar__ChxpWGoueIaAJCLLAAG_-TQrP7U407.jpg.webp",
+      "https://erscglobal2.autoimg.cn/escimg/auto/g34/M09/0B/8B/1400x0_c42_autohomecar__ChxpV2oueIeAeXI5AAHQKsJV1Ak349.jpg.webp",
+      "https://erscglobal2.autoimg.cn/escimg/auto/g34/M05/0B/92/1400x0_c42_autohomecar__ChxpWGoueIeABvLcAAF_EFYP6yg971.jpg.webp",
+      "https://erscglobal2.autoimg.cn/escimg/auto/g34/M03/0B/8B/1400x0_c42_autohomecar__ChxpV2oueIiAdyRiAAGKq4PMvTY715.jpg.webp",
+      "https://erscglobal2.autoimg.cn/escimg/auto/g34/M04/09/0E/1400x0_c42_autohomecar__ChtpWGoueIeAb_NkAAHB9rd6-pQ635.jpg.webp",
+      "https://erscglobal2.autoimg.cn/escimg/auto/g34/M07/0B/92/1400x0_c42_autohomecar__ChxpWGoueIiALDQeAAJm4NYFeNg930.jpg.webp",
+      "https://erscglobal2.autoimg.cn/escimg/auto/g34/M06/0B/8B/1400x0_c42_autohomecar__ChxpV2oueIiAC4qQAAHmjmudAag412.jpg.webp",
+      "https://erscglobal2.autoimg.cn/escimg/auto/g34/M00/09/0F/1400x0_c42_autohomecar__ChtpWGoueIiAaPS5AAIGrlo2e8U777.jpg.webp",
+      "https://erscglobal2.autoimg.cn/escimg/auto/g34/M0B/0B/8B/1400x0_c42_autohomecar__ChxpV2oueImAZh1sAAFqsBRgBIA291.jpg.webp",
+      "https://erscglobal2.autoimg.cn/escimg/auto/g34/M00/0B/8B/1400x0_c42_autohomecar__ChxpV2oueImAOkRoAAG399zomOM815.jpg.webp",
+      "https://erscglobal2.autoimg.cn/escimg/auto/g34/M01/0B/8B/1400x0_c42_autohomecar__ChxpV2oueImAaTm-AAI_teCmvKM272.jpg.webp",
+      "https://erscglobal2.autoimg.cn/escimg/auto/g34/M04/09/0F/1400x0_c42_autohomecar__ChtpWGoueImANA67AAF6K2VOkTY857.jpg.webp",
+      "https://erscglobal2.autoimg.cn/escimg/auto/g34/M07/09/0F/1400x0_c42_autohomecar__ChtpWGoueImAYp44AAId9D8LsY0200.jpg.webp"
+    ],
+    "chinaUrl": "https://pcm.che168.com/2023/cardetail_rn/index?infoid=58751278&pvareaid=108991",
+    "priceWan": null,
+    "priceCny": null,
+    "priceSource": null,
+    "priceUpdatedAt": null,
+    "addedAt": "2026-08-11T07:56:06.801Z",
+    "lastSeenAt": "2026-08-11T07:56:06.801Z",
+    "status": "active",
+    "finalPriceRub": null,
+    "pricingStatus": "waiting_data",
+    "pricingReason": "missing_price",
+    "pricingError": "Нет цены CHE168",
+    "priceIsPreliminary": true
+  },
+  {
+    "id": "59269128",
+    "country": "Китай",
+    "source": "CHE168",
+    "globalUrl": "https://global.che168.com/en/detail/59269128",
+    "name": "Volkswagen Touareg 2023 2.0TSI R-Line Edition",
+    "registrationDate": "2024.12",
+    "year": 2024,
+    "mileage": 26730,
+    "engine": "2.0T",
+    "engineVolume": 2,
+    "engineVolumeCc": 2000,
+    "power": 265,
+    "preferentialPower": false,
+    "transmission": "Автомат",
+    "drive": "Полный",
+    "fuel": "Бензин",
+    "body": "Кроссовер",
+    "photo": "https://erscglobal2.autoimg.cn/escimg/auto/g33/M0B/20/FE/1400x0_c42_autohomecar__ChxpVWp60veABOwvAAEaL_bRD0E672.jpg.webp",
+    "photosCount": 12,
+    "photos": [
+      "https://erscglobal2.autoimg.cn/escimg/auto/g33/M0B/20/FE/1400x0_c42_autohomecar__ChxpVWp60veABOwvAAEaL_bRD0E672.jpg.webp",
+      "https://erscglobal2.autoimg.cn/escimg/auto/g33/M04/20/FE/1400x0_c42_autohomecar__ChxpVWp60veAa4hwAAEUtpAEjAY843.jpg.webp",
+      "https://erscglobal2.autoimg.cn/escimg/auto/g33/M04/21/18/1400x0_c42_autohomecar__Chto52p60veABRw_AAEsldnqEjQ318.jpg.webp",
+      "https://erscglobal2.autoimg.cn/escimg/auto/g33/M0B/21/00/1400x0_c42_autohomecar__ChxpVmp60veABBMNAAGZSdMFKek875.jpg.webp",
+      "https://erscglobal2.autoimg.cn/escimg/auto/g33/M0B/21/18/1400x0_c42_autohomecar__Chto52p60veASmWUAAEXkI8J6yM798.jpg.webp",
+      "https://erscglobal2.autoimg.cn/escimg/auto/g33/M06/21/00/1400x0_c42_autohomecar__ChxpVmp60veAO_x_AAGnNjEqXFM645.jpg.webp",
+      "https://erscglobal2.autoimg.cn/escimg/auto/g33/M07/20/FE/1400x0_c42_autohomecar__ChxpVWp60veAP1MvAAFR3HFlerw283.jpg.webp",
+      "https://erscglobal2.autoimg.cn/escimg/auto/g33/M05/20/FE/1400x0_c42_autohomecar__ChxpVWp60veALwhwAAEuH3t4fhw862.jpg.webp",
+      "https://erscglobal2.autoimg.cn/escimg/auto/g33/M00/20/FE/1400x0_c42_autohomecar__ChxpVWp60veAIGduAAEWpTFtFak516.jpg.webp",
+      "https://erscglobal2.autoimg.cn/escimg/auto/g33/M0B/21/00/1400x0_c42_autohomecar__ChxpVmp60veAEA19AAGXXhLpctA254.jpg.webp",
+      "https://erscglobal2.autoimg.cn/escimg/auto/g33/M00/21/18/1400x0_c42_autohomecar__Chto52p60veAHnSBAAGqBKACoqY487.jpg.webp",
+      "https://erscglobal2.autoimg.cn/escimg/auto/g33/M08/20/FE/1400x0_c42_autohomecar__ChxpVWp60veAcOIpAAG_Oe-He0g664.jpg.webp"
+    ],
+    "chinaUrl": "https://pcm.che168.com/2023/cardetail_rn/index?infoid=59269128&pvareaid=108991",
+    "priceWan": null,
+    "priceCny": null,
+    "priceSource": null,
+    "priceUpdatedAt": null,
+    "addedAt": "2026-08-11T07:56:32.761Z",
+    "lastSeenAt": "2026-08-11T07:56:32.761Z",
+    "status": "active",
+    "finalPriceRub": null,
+    "pricingStatus": "waiting_data",
+    "pricingReason": "missing_price",
+    "pricingError": "Нет цены CHE168",
+    "priceIsPreliminary": true
+  },
+  {
+    "id": "58485050",
+    "country": "Китай",
+    "source": "CHE168",
+    "globalUrl": "https://global.che168.com/en/detail/58485050",
+    "name": "Porsche Macan 2022 Macan 2.0T",
+    "registrationDate": "2023.03",
+    "year": 2023,
+    "mileage": 35000,
+    "engine": "2.0T",
+    "engineVolume": 2,
+    "engineVolumeCc": 2000,
+    "power": 265,
+    "preferentialPower": false,
+    "transmission": "Робот",
+    "drive": "Полный",
+    "fuel": "Бензин",
+    "body": "Кроссовер",
+    "photo": "https://erscglobal2.autoimg.cn/escimg/auto/g34/M06/CD/7D/1400x0_c42_autohomecar__ChxpV2oo10-AfV2YAAX4gDPQoD8677.jpg.webp",
+    "photosCount": 9,
+    "photos": [
+      "https://erscglobal2.autoimg.cn/escimg/auto/g34/M06/CD/7D/1400x0_c42_autohomecar__ChxpV2oo10-AfV2YAAX4gDPQoD8677.jpg.webp",
+      "https://erscglobal2.autoimg.cn/escimg/auto/g34/M04/CB/2B/1400x0_c42_autohomecar__ChtpWGoo10-AKuGIAAV4FcfzRxc007.jpg.webp",
+      "https://erscglobal2.autoimg.cn/escimg/auto/g33/M08/CF/5D/1400x0_c42_autohomecar__Chto52oo11CAdw3oAAYy7vc0tHU469.jpg.webp",
+      "https://erscglobal2.autoimg.cn/escimg/auto/g34/M02/CD/85/1400x0_c42_autohomecar__ChxpWGoo11GAC45mAAfBdKjNCc4152.jpg.webp",
+      "https://erscglobal2.autoimg.cn/escimg/auto/g33/M09/CF/48/1400x0_c42_autohomecar__ChxpVWoo11GAEF1TAAe6C7mx84g852.jpg.webp",
+      "https://erscglobal2.autoimg.cn/escimg/auto/g33/M06/CF/49/1400x0_c42_autohomecar__ChxpVmoo11KAQSnXAAZ0kcRQUQk948.jpg.webp",
+      "https://erscglobal2.autoimg.cn/escimg/auto/g33/M03/CF/5D/1400x0_c42_autohomecar__Chto52oo11KAerYlAAW0yIUCCXA993.jpg.webp",
+      "https://erscglobal2.autoimg.cn/escimg/auto/g34/M07/CD/7E/1400x0_c42_autohomecar__ChxpV2oo11OAFz9qAAU1lQm2oHE741.jpg.webp",
+      "https://erscglobal2.autoimg.cn/escimg/auto/g33/M04/CF/48/1400x0_c42_autohomecar__ChxpVWoo11OAbMXEAAYmcHx_4GE344.jpg.webp"
+    ],
+    "chinaUrl": "https://pcm.che168.com/2023/cardetail_rn/index?infoid=58485050&pvareaid=108991",
+    "priceWan": 30.88,
+    "priceCny": 308800,
+    "priceSource": "CHE168 live",
+    "priceUpdatedAt": "2026-08-11T07:56:45.930Z",
+    "addedAt": "2026-08-11T07:56:45.930Z",
+    "lastSeenAt": "2026-08-11T07:56:45.930Z",
+    "status": "active",
+    "finalPriceRub": null,
+    "pricingStatus": "needs_util_table",
+    "pricingReason": "needs_util_table",
+    "pricingError": "Для мощности выше 160 л.с. нужен коэффициент утильсбора 2026",
+    "customsDutyRub": 514544,
+    "customsOperationFeeRub": 18465,
+    "priceIsPreliminary": true
+  },
+  {
+    "id": "58957041",
+    "country": "Китай",
+    "source": "CHE168",
+    "globalUrl": "https://global.che168.com/en/detail/58957041",
+    "name": "Mercedes-Benz GLC 2022 Facelift II GLC 260 L 4MATIC Sport Model",
+    "registrationDate": "2022.01",
+    "year": 2022,
+    "mileage": 94000,
+    "engine": "2.0T",
+    "engineVolume": 2,
+    "engineVolumeCc": 2000,
+    "power": 197,
+    "preferentialPower": false,
+    "transmission": "Автомат",
+    "drive": "Полный",
+    "fuel": "Бензин",
+    "body": "Кроссовер",
+    "photo": "https://erscglobal2.autoimg.cn/escimg/auto/g33/M0B/30/35/1400x0_c42_autohomecar__ChxpVWpJ38OAcpvbAAWXg1CL5AY680.jpg.webp",
+    "photosCount": 11,
+    "photos": [
+      "https://erscglobal2.autoimg.cn/escimg/auto/g33/M0B/30/35/1400x0_c42_autohomecar__ChxpVWpJ38OAcpvbAAWXg1CL5AY680.jpg.webp",
+      "https://erscglobal2.autoimg.cn/escimg/auto/g33/M07/30/35/1400x0_c42_autohomecar__ChxpVmpJ38SAHrENAAUslW4GDu4303.jpg.webp",
+      "https://erscglobal2.autoimg.cn/escimg/auto/g33/M01/30/35/1400x0_c42_autohomecar__ChxpVWpJ38SAHic-AAXd_U7-KjQ133.jpg.webp",
+      "https://erscglobal2.autoimg.cn/escimg/auto/g33/M06/30/35/1400x0_c42_autohomecar__ChxpVmpJ38WARxruAAiPLlWCyLQ443.jpg.webp",
+      "https://erscglobal2.autoimg.cn/escimg/auto/g33/M02/30/35/1400x0_c42_autohomecar__ChxpVWpJ38WAI4PgAAbWLM2_1Dc716.jpg.webp",
+      "https://erscglobal2.autoimg.cn/escimg/auto/g33/M06/30/35/1400x0_c42_autohomecar__ChxpVWpJ38aALUQFAAaTGknABHo796.jpg.webp",
+      "https://erscglobal2.autoimg.cn/escimg/auto/g33/M03/30/4B/1400x0_c42_autohomecar__Chto52pJ38eAcQiSAAcqUSe7b2M237.jpg.webp",
+      "https://erscglobal2.autoimg.cn/escimg/auto/g33/M03/30/35/1400x0_c42_autohomecar__ChxpVWpJ38iAeZ7xAAeg4x7AXWI865.jpg.webp",
+      "https://erscglobal2.autoimg.cn/escimg/auto/g33/M04/30/35/1400x0_c42_autohomecar__ChxpVWpJ38iAEfUTAAXEB8M0jNE306.jpg.webp",
+      "https://erscglobal2.autoimg.cn/escimg/auto/g33/M0B/30/35/1400x0_c42_autohomecar__ChxpVmpJ38mAMBMtAAVSuPcQuAk264.jpg.webp",
+      "https://erscglobal2.autoimg.cn/escimg/auto/g33/M05/30/35/1400x0_c42_autohomecar__ChxpVmpJ38mAY570AAXQGyuzCkc575.jpg.webp"
+    ],
+    "chinaUrl": "https://pcm.che168.com/2023/cardetail_rn/index?infoid=58957041&pvareaid=108991",
+    "priceWan": 15.8,
+    "priceCny": 158000,
+    "priceSource": "CHE168 live",
+    "priceUpdatedAt": "2026-08-11T07:56:59.630Z",
+    "addedAt": "2026-08-11T07:56:59.630Z",
+    "lastSeenAt": "2026-08-11T07:56:59.630Z",
+    "status": "active",
+    "finalPriceRub": null,
+    "pricingStatus": "needs_util_table",
+    "pricingReason": "needs_util_table",
+    "pricingError": "Для мощности выше 160 л.с. нужен коэффициент утильсбора 2026",
+    "customsDutyRub": 514544,
+    "customsOperationFeeRub": 13541,
+    "priceIsPreliminary": true
+  },
+  {
+    "id": "58896900",
+    "country": "Китай",
+    "source": "CHE168",
+    "globalUrl": "https://global.che168.com/en/detail/58896900",
+    "name": "Mercedes-Benz Maybach GLS 2022 GLS 480 4MATIC",
+    "registrationDate": "2022.09",
+    "year": 2022,
+    "mileage": 70000,
+    "engine": "3.0T",
+    "engineVolume": 3,
+    "engineVolumeCc": 3000,
+    "power": 367,
+    "preferentialPower": false,
+    "transmission": "Автомат",
+    "drive": "Полный",
+    "fuel": "Гибрид",
+    "body": "Кроссовер",
+    "photo": "https://erscglobal2.autoimg.cn/escimg/auto/g33/M05/E0/5C/1400x0_c42_autohomecar__ChxpVWpB9nmAZpqrAAXW9KLzBeo009.jpg.webp",
+    "photosCount": 11,
+    "photos": [
+      "https://erscglobal2.autoimg.cn/escimg/auto/g33/M05/E0/5C/1400x0_c42_autohomecar__ChxpVWpB9nmAZpqrAAXW9KLzBeo009.jpg.webp",
+      "https://erscglobal2.autoimg.cn/escimg/auto/g33/M07/E0/5C/1400x0_c42_autohomecar__ChxpVmpB9nmAWzhaAAanL0dnO-o712.jpg.webp",
+      "https://erscglobal2.autoimg.cn/escimg/auto/g34/M05/DD/F2/1400x0_c42_autohomecar__ChtpWGpB9nqAHMnWAAYmYqFQ_2Y166.jpg.webp",
+      "https://erscglobal2.autoimg.cn/escimg/auto/g34/M01/E0/6E/1400x0_c42_autohomecar__ChxpV2pB9nuAbT-rAAUmZZaTWPc468.jpg.webp",
+      "https://erscglobal2.autoimg.cn/escimg/auto/g33/M02/E0/5C/1400x0_c42_autohomecar__ChxpVWpB9nyATtGtAAVPHnjb4sc397.jpg.webp",
+      "https://erscglobal2.autoimg.cn/escimg/auto/g33/M00/E0/6E/1400x0_c42_autohomecar__Chto52pB9nyAIxsPAATnNMaaANc358.jpg.webp",
+      "https://erscglobal2.autoimg.cn/escimg/auto/g34/M0B/E0/76/1400x0_c42_autohomecar__ChxpWGpB9n2ANSl4AAe2buOa1n4697.jpg.webp",
+      "https://erscglobal2.autoimg.cn/escimg/auto/g34/M09/E0/6E/1400x0_c42_autohomecar__ChxpV2pB9n6ABZrdAAmL4_3QJWY179.jpg.webp",
+      "https://erscglobal2.autoimg.cn/escimg/auto/g34/M07/E0/76/1400x0_c42_autohomecar__ChxpWGpB9n-AGKh0AAhZ2LCvcAQ972.jpg.webp",
+      "https://erscglobal2.autoimg.cn/escimg/auto/g34/M04/DD/F2/1400x0_c42_autohomecar__ChtpWGpB9n-AUwUaAAlNOZ-yRdQ446.jpg.webp",
+      "https://erscglobal2.autoimg.cn/escimg/auto/g34/M06/E0/77/1400x0_c42_autohomecar__ChxpWGpB9oCAbmO7AAhusEakq3E824.jpg.webp"
+    ],
+    "chinaUrl": "https://pcm.che168.com/2023/cardetail_rn/index?infoid=58896900&pvareaid=108991",
+    "priceWan": 79.8,
+    "priceCny": 798000,
+    "priceSource": "CHE168 live",
+    "priceUpdatedAt": "2026-08-11T07:57:11.822Z",
+    "addedAt": "2026-08-11T07:57:11.822Z",
+    "lastSeenAt": "2026-08-11T07:57:11.822Z",
+    "status": "active",
+    "finalPriceRub": null,
+    "pricingStatus": "manual_calculation",
+    "pricingReason": "special_powertrain",
+    "pricingError": "Электро/гибрид требует отдельного расчёта",
+    "customsDutyRub": 857574,
+    "customsOperationFeeRub": 73860,
+    "priceIsPreliminary": true
+  },
+  {
+    "id": "57466655",
+    "country": "Китай",
+    "source": "CHE168",
+    "globalUrl": "https://global.che168.com/en/detail/57466655",
+    "name": "Land Rover Range Rover Sport 2022 5.0 SC V8 SVR",
+    "registrationDate": "2022.01",
+    "year": 2022,
+    "mileage": 57000,
+    "engine": "5.0T",
+    "engineVolume": 5,
+    "engineVolumeCc": 5000,
+    "power": 575,
+    "preferentialPower": false,
+    "transmission": "Автомат",
+    "drive": "Полный",
+    "fuel": "Бензин",
+    "body": "Кроссовер",
+    "photo": "https://erscglobal2.autoimg.cn/escimg/auto/g33/M0A/F8/F6/1400x0_c42_autohomecar__Chto52pbWdSAU08AAAIt7wDgiAI227.jpg.webp",
+    "photosCount": 10,
+    "photos": [
+      "https://erscglobal2.autoimg.cn/escimg/auto/g33/M0A/F8/F6/1400x0_c42_autohomecar__Chto52pbWdSAU08AAAIt7wDgiAI227.jpg.webp",
+      "https://erscglobal2.autoimg.cn/escimg/auto/g33/M03/F8/F6/1400x0_c42_autohomecar__Chto52pbWdWAeYN1AAJrIJ1fBfU371.jpg.webp",
+      "https://erscglobal2.autoimg.cn/escimg/auto/g33/M09/F8/DE/1400x0_c42_autohomecar__ChxpVWpbWdWADJCIAAIztu7C15w578.jpg.webp",
+      "https://erscglobal2.autoimg.cn/escimg/auto/g33/M05/F8/F6/1400x0_c42_autohomecar__Chto52pbWdWAFTgvAAJNVd5MdW4674.jpg.webp",
+      "https://erscglobal2.autoimg.cn/escimg/auto/g33/M0A/F8/DE/1400x0_c42_autohomecar__ChxpVWpbWdaAfcOBAAIS8FKVwRs655.jpg.webp",
+      "https://erscglobal2.autoimg.cn/escimg/auto/g33/M01/F8/DE/1400x0_c42_autohomecar__ChxpVmpbWdaAEQCzAAJPAyQ7Wic697.jpg.webp",
+      "https://erscglobal2.autoimg.cn/escimg/auto/g33/M00/F8/F6/1400x0_c42_autohomecar__Chto52pbWdaAILQrAAORlwxS6Xk061.jpg.webp",
+      "https://erscglobal2.autoimg.cn/escimg/auto/g33/M03/F8/DE/1400x0_c42_autohomecar__ChxpVmpbWdeAYZdtAAKh1iffofw992.jpg.webp",
+      "https://erscglobal2.autoimg.cn/escimg/auto/g33/M06/F8/F6/1400x0_c42_autohomecar__Chto52pbWdeAH432AAMLrX5kdbI367.jpg.webp",
+      "https://erscglobal2.autoimg.cn/escimg/auto/g33/M06/F8/DE/1400x0_c42_autohomecar__ChxpVWpbWdeAKLvJAAM3-pPpmxk911.jpg.webp"
+    ],
+    "chinaUrl": "https://pcm.che168.com/2023/cardetail_rn/index?infoid=57466655&pvareaid=108991",
+    "priceWan": 73.8,
+    "priceCny": 738000,
+    "priceSource": "CHE168 live",
+    "priceUpdatedAt": "2026-08-11T07:57:25.456Z",
+    "addedAt": "2026-08-11T07:57:25.456Z",
+    "lastSeenAt": "2026-08-11T07:57:25.456Z",
+    "status": "active",
+    "finalPriceRub": null,
+    "pricingStatus": "needs_util_table",
+    "pricingReason": "needs_util_table",
+    "pricingError": "Для мощности выше 160 л.с. нужен коэффициент утильсбора 2026",
+    "customsDutyRub": 1715148,
+    "customsOperationFeeRub": 73860,
+    "priceIsPreliminary": true
+  },
+  {
+    "id": "58514446",
+    "country": "Китай",
+    "source": "CHE168",
+    "globalUrl": "https://global.che168.com/en/detail/58514446",
+    "name": "BMW X4 M40i 2022 M40i",
+    "registrationDate": "2023.07",
+    "year": 2023,
+    "mileage": 57000,
+    "engine": "3.0T",
+    "engineVolume": 3,
+    "engineVolumeCc": 3000,
+    "power": 333,
+    "preferentialPower": false,
+    "transmission": "Автомат",
+    "drive": "Полный",
+    "fuel": "Бензин",
+    "body": "Кроссовер",
+    "photo": "https://erscglobal2.autoimg.cn/escimg/auto/g34/M04/23/D9/1400x0_c42_autohomecar__ChxpWGpfMiyAOruiAAWHuNjGky8989.jpg.webp",
+    "photosCount": 13,
+    "photos": [
+      "https://erscglobal2.autoimg.cn/escimg/auto/g34/M04/23/D9/1400x0_c42_autohomecar__ChxpWGpfMiyAOruiAAWHuNjGky8989.jpg.webp",
+      "https://erscglobal2.autoimg.cn/escimg/auto/g34/M02/23/D9/1400x0_c42_autohomecar__ChxpWGpfMi2ABmlFAAT9P5R87Kc629.jpg.webp",
+      "https://erscglobal2.autoimg.cn/escimg/auto/g34/M08/20/F5/1400x0_c42_autohomecar__ChtpWGpfMi2ASQRdAAYQ-3LfI-A562.jpg.webp",
+      "https://erscglobal2.autoimg.cn/escimg/auto/g34/M0B/20/F5/1400x0_c42_autohomecar__ChtpWGpfMi6AWmCyAAjXw1cJ2HA606.jpg.webp",
+      "https://erscglobal2.autoimg.cn/escimg/auto/g34/M02/23/CF/1400x0_c42_autohomecar__ChxpV2pfMi-ACnHNAAg778JEpl4457.jpg.webp",
+      "https://erscglobal2.autoimg.cn/escimg/auto/g34/M0A/23/D9/1400x0_c42_autohomecar__ChxpWGpfMi-AJovKAAVFRvNevHs396.jpg.webp",
+      "https://erscglobal2.autoimg.cn/escimg/auto/g34/M06/23/CF/1400x0_c42_autohomecar__ChxpV2pfMjCAPq-bAAWgwgqo7q4197.jpg.webp",
+      "https://erscglobal2.autoimg.cn/escimg/auto/g34/M0B/23/D9/1400x0_c42_autohomecar__ChxpWGpfMjCAKCKWAAWZs6kRp3w307.jpg.webp",
+      "https://erscglobal2.autoimg.cn/escimg/auto/g34/M08/23/D0/1400x0_c42_autohomecar__ChxpV2pfMjGAdWkfAAV9X1lTTMc183.jpg.webp",
+      "https://erscglobal2.autoimg.cn/escimg/auto/g34/M00/20/F5/1400x0_c42_autohomecar__ChtpWGpfMjGATlVNAAiZo6D9Y_4161.jpg.webp",
+      "https://erscglobal2.autoimg.cn/escimg/auto/g34/M06/23/D9/1400x0_c42_autohomecar__ChxpWGpfMjKAGXyRAAYN0ikjUl4077.jpg.webp",
+      "https://erscglobal2.autoimg.cn/escimg/auto/g34/M03/23/D0/1400x0_c42_autohomecar__ChxpV2pfMjOAbplBAAh6z8TEXC0557.jpg.webp",
+      "https://erscglobal2.autoimg.cn/escimg/auto/g34/M0B/23/DA/1400x0_c42_autohomecar__ChxpWGpfMjOAd5LPAAmJ36uOzZU615.jpg.webp"
+    ],
+    "chinaUrl": "https://pcm.che168.com/2023/cardetail_rn/index?infoid=58514446&pvareaid=108991",
+    "priceWan": 26.88,
+    "priceCny": 268800,
+    "priceSource": "CHE168 live",
+    "priceUpdatedAt": "2026-08-11T07:57:44.099Z",
+    "addedAt": "2026-08-11T07:57:44.099Z",
+    "lastSeenAt": "2026-08-11T07:57:44.099Z",
+    "status": "active",
+    "finalPriceRub": null,
+    "pricingStatus": "needs_util_table",
+    "pricingReason": "needs_util_table",
+    "pricingError": "Для мощности выше 160 л.с. нужен коэффициент утильсбора 2026",
+    "customsDutyRub": 857574,
+    "customsOperationFeeRub": 18465,
+    "priceIsPreliminary": true
+  },
+  {
+    "id": "58492200",
+    "country": "Китай",
+    "source": "CHE168",
+    "globalUrl": "https://global.che168.com/en/detail/58492200",
+    "name": "Mercedes-Benz GLB 2022 GLB 220 Style",
+    "registrationDate": "2022.05",
+    "year": 2022,
+    "mileage": 54000,
+    "engine": "2.0T",
+    "engineVolume": 2,
+    "engineVolumeCc": 2000,
+    "power": 190,
+    "preferentialPower": false,
+    "transmission": "8-Speed Wet Dual Clutch",
+    "drive": "Передний",
+    "fuel": "Бензин",
+    "body": "Кроссовер",
+    "photo": "https://erscglobal2.autoimg.cn/escimg/auto/g33/M01/26/32/1400x0_c42_autohomecar__ChxpVmpfMm2AZ7XbAAancCcNNeI588.jpg.webp",
+    "photosCount": 11,
+    "photos": [
+      "https://erscglobal2.autoimg.cn/escimg/auto/g33/M01/26/32/1400x0_c42_autohomecar__ChxpVmpfMm2AZ7XbAAancCcNNeI588.jpg.webp",
+      "https://erscglobal2.autoimg.cn/escimg/auto/g33/M02/26/49/1400x0_c42_autohomecar__Chto52pfMm6AKCdrAAWcEZaXRww315.jpg.webp",
+      "https://erscglobal2.autoimg.cn/escimg/auto/g33/M0B/26/32/1400x0_c42_autohomecar__ChxpVmpfMm6AFzbhAAbU1R_bGEk320.jpg.webp",
+      "https://erscglobal2.autoimg.cn/escimg/auto/g34/M03/23/D1/1400x0_c42_autohomecar__ChxpV2pfMm-Ac-CqAAXpUxv6PZQ577.jpg.webp",
+      "https://erscglobal2.autoimg.cn/escimg/auto/g33/M03/26/32/1400x0_c42_autohomecar__ChxpVmpfMnCAJ75wAAWRs1wgV0E551.jpg.webp",
+      "https://erscglobal2.autoimg.cn/escimg/auto/g34/M0B/23/DB/1400x0_c42_autohomecar__ChxpWGpfMnCAChfMAAXl65-vSRg368.jpg.webp",
+      "https://erscglobal2.autoimg.cn/escimg/auto/g34/M00/23/DB/1400x0_c42_autohomecar__ChxpWGpfMnGARJnvAAjbh0hzA1Y063.jpg.webp",
+      "https://erscglobal2.autoimg.cn/escimg/auto/g33/M07/26/32/1400x0_c42_autohomecar__ChxpVmpfMnGAPWbuAAd2er7D-9s666.jpg.webp",
+      "https://erscglobal2.autoimg.cn/escimg/auto/g33/M0B/26/30/1400x0_c42_autohomecar__ChxpVWpfMnKABMO7AAlrtGjbvL4919.jpg.webp",
+      "https://erscglobal2.autoimg.cn/escimg/auto/g33/M00/26/32/1400x0_c42_autohomecar__ChxpVmpfMnOAIakmAAk4ISDfif0310.jpg.webp",
+      "https://erscglobal2.autoimg.cn/escimg/auto/g34/M01/20/F7/1400x0_c42_autohomecar__ChtpWGpfMnOAav2gAAeLOOKtgtY720.jpg.webp"
+    ],
+    "chinaUrl": "https://pcm.che168.com/2023/cardetail_rn/index?infoid=58492200&pvareaid=108991",
+    "priceWan": null,
+    "priceCny": null,
+    "priceSource": null,
+    "priceUpdatedAt": null,
+    "addedAt": "2026-08-11T07:58:29.092Z",
+    "lastSeenAt": "2026-08-11T07:58:29.092Z",
+    "status": "active",
+    "finalPriceRub": null,
+    "pricingStatus": "waiting_data",
+    "pricingReason": "missing_price",
+    "pricingError": "Нет цены CHE168",
+    "priceIsPreliminary": true
+  },
+  {
+    "id": "59112054",
+    "country": "Китай",
+    "source": "CHE168",
+    "globalUrl": "https://global.che168.com/en/detail/59112054",
+    "name": "Land Rover Land Rover Defender 2023 Model 110 3.0T P400 X-DYNAMIC HSE",
+    "registrationDate": "2022.06",
+    "year": 2022,
+    "mileage": 33000,
+    "engine": "3.0T",
+    "engineVolume": 3,
+    "engineVolumeCc": 3000,
+    "power": 400,
+    "preferentialPower": false,
+    "transmission": "Автомат",
+    "drive": "Полный",
+    "fuel": "Гибрид",
+    "body": "Кроссовер",
+    "photo": "https://erscglobal2.autoimg.cn/escimg/auto/g33/M04/27/9F/1400x0_c42_autohomecar__Chto52pfUcGAV1xGAAZJShmMQPM861.jpg.webp",
+    "photosCount": 12,
+    "photos": [
+      "https://erscglobal2.autoimg.cn/escimg/auto/g33/M04/27/9F/1400x0_c42_autohomecar__Chto52pfUcGAV1xGAAZJShmMQPM861.jpg.webp",
+      "https://erscglobal2.autoimg.cn/escimg/auto/g34/M02/25/20/1400x0_c42_autohomecar__ChxpWGpfUcKAWN2mAAZsM0DCn6I888.jpg.webp",
+      "https://erscglobal2.autoimg.cn/escimg/auto/g34/M01/25/16/1400x0_c42_autohomecar__ChxpV2pfUcKADtCFAAX7_eoV74o481.jpg.webp",
+      "https://erscglobal2.autoimg.cn/escimg/auto/g34/M02/25/16/1400x0_c42_autohomecar__ChxpV2pfUcOABzaxAAY7zoJtFHE984.jpg.webp",
+      "https://erscglobal2.autoimg.cn/escimg/auto/g34/M03/25/16/1400x0_c42_autohomecar__ChxpV2pfUcOAII-DAAaU5Mkk93U257.jpg.webp",
+      "https://erscglobal2.autoimg.cn/escimg/auto/g34/M08/25/20/1400x0_c42_autohomecar__ChxpWGpfUcSAJHaiAAXP3a7pF2Q735.jpg.webp",
+      "https://erscglobal2.autoimg.cn/escimg/auto/g34/M04/22/3C/1400x0_c42_autohomecar__ChtpWGpfUcSAWDWRAAcCegCnIz8027.jpg.webp",
+      "https://erscglobal2.autoimg.cn/escimg/auto/g34/M07/25/16/1400x0_c42_autohomecar__ChxpV2pfUcWATxMdAAedPprtMls705.jpg.webp",
+      "https://erscglobal2.autoimg.cn/escimg/auto/g34/M03/22/3C/1400x0_c42_autohomecar__ChtpWGpfUcWAEizZAAhv6ElMWgc347.jpg.webp",
+      "https://erscglobal2.autoimg.cn/escimg/auto/g34/M08/25/16/1400x0_c42_autohomecar__ChxpV2pfUcaABngOAAeLDf7lUVQ784.jpg.webp",
+      "https://erscglobal2.autoimg.cn/escimg/auto/g34/M00/25/20/1400x0_c42_autohomecar__ChxpWGpfUceAblHsAAcGi1ExgnI582.jpg.webp",
+      "https://erscglobal2.autoimg.cn/escimg/auto/g34/M09/25/16/1400x0_c42_autohomecar__ChxpV2pfUceAIpCyAAcIb3gimu0897.jpg.webp"
+    ],
+    "chinaUrl": "https://pcm.che168.com/2023/cardetail_rn/index?infoid=59112054&pvareaid=108991",
+    "priceWan": 50.8,
+    "priceCny": 508000,
+    "priceSource": "CHE168 live",
+    "priceUpdatedAt": "2026-08-11T07:58:43.522Z",
+    "addedAt": "2026-08-11T07:58:43.522Z",
+    "lastSeenAt": "2026-08-11T07:58:43.522Z",
+    "status": "active",
+    "finalPriceRub": null,
+    "pricingStatus": "manual_calculation",
+    "pricingReason": "special_powertrain",
+    "pricingError": "Электро/гибрид требует отдельного расчёта",
+    "customsDutyRub": 857574,
+    "customsOperationFeeRub": 49240,
+    "priceIsPreliminary": true
   }
 ]
