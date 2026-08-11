@@ -1,17 +1,21 @@
-const { chromium } = require('playwright');
-const fs = require('fs');
+const LIST_PAGES = 10;
 
-const LIST_PAGES = 2;
+// В каталог берём только автомобили
+// 2020 года и новее
+const MIN_CAR_YEAR = 2020;
 
-// За один запуск добавляем максимум 6 новых машин
-const MAX_NEW_CARS_PER_RUN = 6;
+// За один запуск добавляем максимум
+// 15 новых подходящих автомобилей
+const MAX_NEW_CARS_PER_RUN = 15;
 
-// Дополнительно повторяем получение цены
-// для двух машин, у которых цена ранее не загрузилась
-const MAX_PRICE_RETRIES_PER_RUN = 2;
+// Повторно пробуем получить цену
+// для машин, у которых CHE168
+// временно не отдал китайскую цену
+const MAX_PRICE_RETRIES_PER_RUN = 4;
 
-// Пока ограничиваем тестовый каталог 50 машинами
-const CATALOG_LIMIT = 50;
+// На первом этапе держим
+// до 500 автомобилей в базе
+const CATALOG_LIMIT = 500;
 
 
 function firstMatch(text, regex) {
@@ -1177,7 +1181,12 @@ async function scrapeChinaPrice(
 (async () => {
 
   const savedCars =
-    loadSavedCars();
+  loadSavedCars()
+    .filter(
+      car =>
+        Number(car.year) >=
+        MIN_CAR_YEAR
+    );
 
 
   const carsById =
@@ -1310,10 +1319,45 @@ async function scrapeChinaPrice(
       try {
 
         const details =
-          await scrapeGlobalCar(
-            browser,
-            id
-          );
+  await scrapeGlobalCar(
+    browser,
+    id
+  );
+
+
+/*
+==================================================
+ФИЛЬТР ПО ГОДУ
+==================================================
+
+Каталог VAN AUTO:
+только автомобили 2020 года
+и новее.
+
+Если год не удалось определить,
+такую машину тоже пока не добавляем.
+*/
+
+if (
+  !details.year ||
+  Number(details.year) <
+  MIN_CAR_YEAR
+) {
+
+  console.log(
+    `Машина ${id} пропущена: год ${details.year || 'не определён'}`
+  );
+
+  continue;
+
+}
+
+
+const price =
+  await scrapeChinaPrice(
+    browser,
+    id
+  );
 
 
         const price =
