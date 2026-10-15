@@ -1,10 +1,10 @@
 {
-  "updatedAt": "2026-10-15T06:04:20.436Z",
+  "updatedAt": "2026-10-15T11:47:14.092Z",
   "cbr": {
     "cnyRub": 12.5358,
     "eurRub": 93.9229
   },
   "vtbCnySell": 12.5,
   "vtbSource": "GitHub Variable VTB_CNY_RATE",
-  "vtbObservedAt": "2026-10-15T06:04:20.436Z"
+  "vtbObservedAt": "2026-10-15T11:47:14.092Z"
 }
